@@ -1,0 +1,12 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+Computation times
+=================
+**00:19.659** total execution time for **auto_examples** files:
+
+- **00:09.200**: :ref:`sphx_glr_auto_examples_plot_spectral_unmixing.py` (``plot_spectral_unmixing.py``)
+- **00:05.767**: :ref:`sphx_glr_auto_examples_plot_fft_2d_filtering.py` (``plot_fft_2d_filtering.py``)
+- **00:04.692**: :ref:`sphx_glr_auto_examples_plot_image_registration.py` (``plot_image_registration.py``)
