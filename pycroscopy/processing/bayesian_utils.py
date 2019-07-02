@@ -477,28 +477,24 @@ def simple_graphs(verbose=False):
 
     if self.verbose: print("Simple graph plotting complete.")
 
-# Here is our main function if we want to do a USID graph
-def USID_graph(h5_resh, pixelNumber):
-    #pixelData = getDataFromTxt("imeas_220.txt")
+def USID_graph(h5_resh, pixelNumber, verbose=False):
+    """
+    Main function for plotting a USID graph
+    
+    Parameters
+    ----------
+    h5_resh: 
+    pixel_number: 
+    verbose: (optional) Boolean
+        set True for verbose
+        for the purpose of debugging
+        
+    Notes
+    -----
+    #add any notes needed
+    """
 
-    #h5Path = "pzt_nanocap_6_split_bayesian_compensation_R_correction.h5"
-    #pixelData = getDataFromUSID(h5Path, 32444)
-
-    '''###
-    # Open the file
-    h5File = h5py.File(h5Path)
-    # Grab the main dataset
-    h5Group = h5File["Measurement_000/Channel_000"]
-    h5Main = usid.USIDataset(h5Group["Raw_Data"])
-    # Assume that we have already filterd and reshaped the data
-    # Now load in a filtered and reshaped data
-    h5_filt_grp = usid.hdf_utils.find_results_groups(h5Main, "FFT_Filtering")[-1]
-    h5_filt = h5_filt_grp["Filtered_Data"]
-    h5_resh_grp = usid.hdf_utils.find_results_groups(h5_filt, "Reshape")[-1]
-    h5_resh = usid.USIDataset(h5_resh_grp["Reshaped_Data"])
-    ###'''
     pixelData = get_data_from_reshaped_USID(h5_resh, pixelNumber)
-    ###'''
 
     Vfor, Ifor, Vrev, Irev = get_forward_and_reverse(pixelData)
 
