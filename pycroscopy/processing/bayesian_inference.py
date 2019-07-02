@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-Add description
+Runs a full Bayesian inference algorithm on spectroscopic data for ultrafast current imaging (see paper below)
+https://www.nature.com/articles/s41467-017-02455-7
 
 Created on Tue July 02, 2019
 
@@ -18,13 +19,22 @@ from pyUSID.io.hdf_utils import create_results_group, write_main_dataset, write_
     write_ind_val_dsets
 from pyUSID.io.write_utils import Dimension
 
-# Add other needed imports
+import time
+import math
+import scipy.linalg as spla 
+import pycroscopy as px 
+import pyUSID as usid
+from .bayesianTest import USIDMain
+from .bayesianTest import getForwardAndReverseData as gFARD
+from .bayesianTest import setUpConstantsAndInitialConditions as sUCAIC 
+from .bayesianTest import doAdaptiveMetropolis as dAM 
+
 
 # TODO: correct implementation of num_pix
 
 
 class AdaptiveBayesianInference(Process):
-    #what parameters do you need?
+    # Note: this assumes use of reshaped data
     def __init__(self, h5_main, *args,  **kwargs):
         """
         What does this class do?
@@ -42,10 +52,13 @@ class AdaptiveBayesianInference(Process):
 
         # Now do some setting of the variables
         # Ex. self.frequency_filters = frequency_filters
+        self.fullV = [float(v) for v in self.h5_main.h5_spec_vals[()][0]][::4]
 
         # Name the process
         # Ex. self.process_name = 'FFT_Filtering'
+        self.process_name = 'AdaptiveBayesian'
 
+        # Honestly no idea what this line does
         self.duplicate_h5_groups, self.partial_h5_groups = self._check_for_duplicates()
 
         self.data = None
@@ -53,18 +66,15 @@ class AdaptiveBayesianInference(Process):
         # Ex. self.filtered_data = None
 
 
-    def test(self, pix_ind=None, excit_wfm=None, **kwargs):
+    def test(self, pix_ind=None):
         """
-        Tests the signal filter on a single pixel (randomly chosen unless manually specified) worth of data.
+        Tests the Bayesian inference on a single pixel (randomly chosen unless manually specified) worth of data.
+        Displays the resulting figure (resistances with variance, and reconstructed current)
+            before returning the same figure.
         Parameters
         ----------
         pix_ind : int, optional. default = random
             Index of the pixel whose data will be used for inference
-        excit_wfm : array-like, optional. default = None
-            Waveform against which the raw and filtered signals will be plotted. This waveform can be a fraction of the
-            length of a single pixel's data. For example, in the case of G-mode, where a single scan line is yet to be
-            broken down into pixels, the excitation waveform for a single pixel can br provided to automatically
-            break the raw and filtered responses also into chunks of the same size.
         Returns
         -------
         fig, axes
@@ -75,9 +85,7 @@ class AdaptiveBayesianInference(Process):
             pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
 
         # Return from test function you built seperately (see gmode_utils.test_filter for example)
-        return test_filter(self.h5_main[pix_ind], frequency_filters=self.frequency_filters, excit_wfm=excit_wfm,
-                           noise_threshold=self.noise_threshold, plot_title='Pos #' + str(pix_ind), show_plots=True,
-                           **kwargs)
+        return USIDMain(self.h5_resh, pix_ind)
 
     def _create_results_datasets(self):
         """
@@ -124,3 +132,29 @@ class AdaptiveBayesianInference(Process):
         """
         # This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
         #like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

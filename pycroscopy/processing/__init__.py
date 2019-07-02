@@ -34,4 +34,4 @@ from .tree import ClusterTree
 from . import proc_utils
 
 __all__ = ['Cluster', 'Decomposition', 'ImageWindow', 'SVD', 'fft', 'gmode_utils', 'histogram', 'svd_utils',
-           'rebuild_svd', 'SignalFilter', 'ClusterTree', 'proc_utils']
+           'rebuild_svd', 'SignalFilter', 'ClusterTree', 'proc_utils', 'AdaptiveBayesianInference']
