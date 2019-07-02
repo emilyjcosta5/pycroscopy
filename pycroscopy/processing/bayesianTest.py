@@ -70,6 +70,12 @@ def getDataFromUSID(fileName, pixelNumber):
     # Just return the voltage and response for now
     return [float(v) for v in single_AO[::4]], [float(v) for v in h5_resh[pixelNumber, ::4]]
 
+# Takes in the reshaped main USIDatabase and returns V and Imeas data
+def getDataFromUSID2(h5_resh, pixelNumber):
+    # Note: h5_resh.file returns h5File. h5_resh_grp does not hold any
+    # of the attributes we want for ex_amp and whatnot.
+    return [float(v) for v in h5_resh.h5_spec_vals[()][0]][::4], [float(v) for v in h5_resh[pixelNumber, ::4]]
+
 # Takes float lists fullV and fullImeas and splits them into forward
 # and reverse directions. Assumes the fullV is a sine wave.
 # Returns Vfor, Ifor, Vrev, Irev as 1D numpy arrays.
@@ -203,7 +209,7 @@ def setUpConstantsAndInitialConditions(V, Imeas, f=200, V0=6):
     ppp = mm # using p as a variable makes pdb bug out
     P0 = np.linalg.inv(C0)
 
-    return ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint, A1, m, x #N, t, x (these last three are for simple graphs)
+    return ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint, A1, m, x, N, t #, x (these last three are for simple graphs)
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in doAdaptiveMetropolis()
@@ -298,7 +304,7 @@ def doAdaptiveMetropolis(metroData):
 def plotSimpleGraphs(graphData, metroBits):
     # Parse the input to what we want.
     V, dV, Imeas, Ns, M, S, S1, S1lag, P, A = graphData
-    N, t, x = metroBits
+    x, N, t = metroBits
 
     ACL1 = (S1lag - np.square(S1))/np.diag(np.matmul(S, S.T))[np.newaxis].T
 
@@ -376,49 +382,69 @@ def plotPycroscopyGraphs(fullV, fullImeas, meanr, varr, x, Irec, capacitance):
     fig.show()
 
     # Wait here to allow the user to view the graphs
-    input("Press <Enter> to continue...")
+    #input("Press <Enter> to continue...")
+    return fig
 
 # Here is our main function if we want to do a simple graph
 def simpleMain():
     #pixelData = getDataFromTxt("imeas_220.txt")
     h5Path = "pzt_nanocap_6_split_bayesian_compensation_R_correction.h5"
-    pixelData = getDataFromUSID(h5Path, 220)
+    pixelData = getDataFromUSID(h5Path, 32444)
 
     Vfor, Ifor, Vrev, Irev = getForwardAndReverseData(pixelData)
 
     # Do the forward direction
     print("Going in the forward direction.")
     forwardMetroData = setUpConstantsAndInitialConditions(Vfor, Ifor)
-    forwardGraphData = doAdaptiveMetropolis(forwardMetroData[:-3])
+    forwardGraphData = doAdaptiveMetropolis(forwardMetroData[:-5])
     plotSimpleGraphs(forwardGraphData, forwardMetroData[-3:])
 
     # Do the reverse direction
     print("Going in the reverse direction.")
     reverseMetroData = setUpConstantsAndInitialConditions(Vrev, Irev)
-    reverseGraphData = doAdaptiveMetropolis(reverseMetroData[:-3])
+    reverseGraphData = doAdaptiveMetropolis(reverseMetroData[:-5])
     plotSimpleGraphs(reverseGraphData, forwardMetroData[-3:])
 
     # That is all
     print("Done.")
 
 # Here is our main function if we want to do a USID graph
-def USIDMain():
-    pixelData = getDataFromTxt("imeas_220.txt")
+def USIDMain(h5_resh, pixelNumber):
+    #pixelData = getDataFromTxt("imeas_220.txt")
+
     #h5Path = "pzt_nanocap_6_split_bayesian_compensation_R_correction.h5"
     #pixelData = getDataFromUSID(h5Path, 32444)
+
+    '''###
+    # Open the file
+    h5File = h5py.File(h5Path)
+
+    # Grab the main dataset
+    h5Group = h5File["Measurement_000/Channel_000"]
+    h5Main = usid.USIDataset(h5Group["Raw_Data"])
+
+    # Assume that we have already filterd and reshaped the data
+    # Now load in a filtered and reshaped data
+    h5_filt_grp = usid.hdf_utils.find_results_groups(h5Main, "FFT_Filtering")[-1]
+    h5_filt = h5_filt_grp["Filtered_Data"]
+    h5_resh_grp = usid.hdf_utils.find_results_groups(h5_filt, "Reshape")[-1]
+    h5_resh = usid.USIDataset(h5_resh_grp["Reshaped_Data"])
+    ###'''
+    pixelData = getDataFromUSID2(h5_resh, pixelNumber)
+    ###'''
 
     Vfor, Ifor, Vrev, Irev = getForwardAndReverseData(pixelData)
 
     # Do the forward direction
     print("Going in the forward direction.")
     forwardMetroData = setUpConstantsAndInitialConditions(Vfor, Ifor)
-    forwardGraphData = doAdaptiveMetropolis(forwardMetroData[:-3])
+    forwardGraphData = doAdaptiveMetropolis(forwardMetroData[:-5])
     #plotSimpleGraphs(forwardGraphData, forwardMetroData[-3:])
 
     # Do the reverse direction
     print("Going in the reverse direction.")
     reverseMetroData = setUpConstantsAndInitialConditions(Vrev, Irev)
-    reverseGraphData = doAdaptiveMetropolis(reverseMetroData[:-3])
+    reverseGraphData = doAdaptiveMetropolis(reverseMetroData[:-5])
     #plotSimpleGraphs(reverseGraphData, forwardMetroData[-3:])
 
     #breakpoint()
@@ -443,25 +469,48 @@ def USIDMain():
     meanr = np.concatenate((meanrFor, meanrRev))
     varr = np.concatenate((np.diag(varrFor), np.diag(varrRev)))
 
-    x = np.concatenate((forwardMetroData[-1], -1*reverseMetroData[-1]))
-    IrecFor = np.matmul(forwardMetroData[-3], forwardMetroData[-2])
-    IrecRev = np.matmul(reverseMetroData[-3], reverseMetroData[-2])
+    x = np.concatenate((forwardMetroData[-3], -1*reverseMetroData[-3]))
+    IrecFor = np.matmul(forwardMetroData[-5], forwardMetroData[-4])
+    IrecRev = np.matmul(reverseMetroData[-5], reverseMetroData[-4])
     Irec = np.concatenate((IrecFor, IrecRev))
-    capacitance = (forwardMetroData[-2][-1]+reverseMetroData[-2][-1])[0]/2
+    capacitance = (forwardMetroData[-4][-1]+reverseMetroData[-4][-1])[0]/2
     
     #breakpoint()
 
-    plotPycroscopyGraphs(fullV, fullImeas, meanr, varr, x, Irec, capacitance)
+    return plotPycroscopyGraphs(fullV, fullImeas, meanr, varr, x, Irec, capacitance)
     #plotPycroscopyGraphs(np.array(pixelData[0]), np.array(pixelData[1]), meanr, varr, x, Irec, capacitance)
 
     #breakpoint()
 
+if __name__ == '__main__':
+    #pixelData = getDataFromTxt("imeas_220.txt")
+
+    h5Path = "pzt_nanocap_6_split_bayesian_compensation_R_correction.h5"
+    #pixelData = getDataFromUSID(h5Path, 32444)
+
+    ###
+    # Open the file
+    h5File = h5py.File(h5Path)
+
+    # Grab the main dataset
+    h5Group = h5File["Measurement_000/Channel_000"]
+    h5Main = usid.USIDataset(h5Group["Raw_Data"])
+
+    # Assume that we have already filterd and reshaped the data
+    # Now load in a filtered and reshaped data
+    h5_filt_grp = usid.hdf_utils.find_results_groups(h5Main, "FFT_Filtering")[-1]
+    h5_filt = h5_filt_grp["Filtered_Data"]
+    h5_resh_grp = usid.hdf_utils.find_results_groups(h5_filt, "Reshape")[-1]
+    h5_resh = usid.USIDataset(h5_resh_grp["Reshaped_Data"])
+    USIDMain(h5_resh, 32444)
+    input("Tis the end of USIDMain. Check the graph...")
+    simpleMain()
+    input("Tis the end of simpleMain. Check the graphs...")
     # That is all
     print("Done.")
 
-# Here is our main function. It brings all the other functions together.
-if __name__ == '__main__':
-    # Either graph simple graphs or USID graphs
-    # Note: the return values for setUpConstraintsAndInitialConditions()
-    # have to be changed to switch between simple and USID graphs
-    USIDMain()
+
+
+
+
+    
