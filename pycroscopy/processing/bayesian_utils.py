@@ -16,9 +16,157 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
+# Does math stuff and returns a number relevant to some probability distribution.
+# Used only in the while loop of run_bayesian_inference() (and once before to initialize)
+def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
+    if pp[-1] > Rmax or pp[-1] < Rmin:
+        return np.inf
+    if pp[-2] > Cmax or pp[-2] < Cmin:
+        return np.inf
+    
+    out = np.linalg.norm(V*np.exp(np.matmul(-A[:, :-1], pp[:-2])) + \
+                         pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
+          np.matmul(np.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
 
-def run_bayesian_inference(V )
+    return out
 
+def run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e6), verbose=False):
+	'''
+	Takes in raw filtered data, parses it down and into forward and reverse sweeps,
+	and runs an adaptive metropolis alglrithm on the data. Then calculates the
+	projected resistances and variances for both the forward and reverse sweeps, as
+	well as the reconstructed current.
+
+	Parameters
+	----------
+	V:			numpy.ndtype row vector of dimension 1xN
+				the excitation waveform; assumed to be a single period of a sine wave
+	i_meas:		numpy.ndtype row vector of dimension 1xN
+				the measured current resulting from the excitation waveform
+	f:			int
+				the frequency of the excitation waveform (Hz)
+	V0:			int
+				the amplitude of the excitation waveform (V)
+	Ns:			int
+				the number of iterations we want the adaptive metropolis to run
+	verbose:	boolean
+				prints debugging messages if True
+
+	Returns
+	-------
+	R_forward:		numpy.ndtype column vector
+					the reconstructed resistances for the forward sweep
+	R_reverse:		numpy.ndtype column vector
+					the reconstructed resistances for the reverse sweep
+	R_sig_forward:	numpy.ndtype column vector
+					the standard deviations of R_forward resistances 
+	R_sig_reverse:	numpy.ndtype column vector
+					the standard deviations of R_reverse resistances
+	i_recon:		numpy.ndtype column vector
+					the reconstructed current
+	'''
+	# Grab the start time so we can see how long this takes
+	if(verbose):
+		startTime = time.time()
+
+	# Setup some constants that will be used throughout the code
+    Rmax = 100
+    Rmin = -1e-6
+
+    nt = 1000;
+    nx = 32;
+
+    r_extra = 0.110
+    ff = 1e0
+
+    gam = 0.01
+    sigc = 10
+    sigma = 1
+
+    tmax = 1/f/2
+    t = np.linspace(0, tmax, V.size)
+    dt = t[1] - t[0]
+    dV = np.diff(V)/dt
+    dV = np.append(dV, dV[dV.size-1])
+    N = V.size 
+    x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    dx = x[1] - x[0]
+    M = x.size
+
+    # Change V and dV into column vectors for computations
+    # Note: V has to be a row vector for np.diff(V) and
+    # max(V) to work properly
+    dV = dV[np.newaxis].T
+    V = V[np.newaxis].T
+    i_meas = i_meas[np.newaxis].T
+
+    # Build A : the forward map
+    A = np.zeros((N, M + 1)).astype(complex)
+    for j in range(N):
+        # Note: ix will be used to index into arrays, so it is one less
+        # than the ix used in the Matlab code
+        ix = math.floor((V[j] + V0)/dx) + 1
+        ix = min(ix, x.size - 1)
+        ix = max(ix, 1)
+        A[j, ix] = (V[j] - x[ix-1])/(x[ix] - x[ix-1])
+        A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
+    A[:, M] = (dV + ff*r_extra*V).T # take the transpose cuz python is dumb
+
+    # Similar to above, but used to simulate data and invert for E(s|y)
+    # for initial condition
+    A1 = np.zeros((N, M + 1)).astype(complex)
+    for j in range(N):
+        # Note: Again, ix is one less than it is in the Matlab code
+        ix = math.floor((V[j] + V0)/dx)+1
+        ix = min(ix, x.size - 1)
+        ix = max(ix, 1)
+        A1[j, ix] = V[j]*(V[j] - x[ix-1])/(x[ix] - x[ix-1])
+        A1[j, ix-1] = V[j]*(1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]))
+    A1[:, M] = (dV + ff*r_extra*V).T # transpose again here
+
+    # A rough guess for the initial condition is a bunch of math stuff
+    # This is an approximation of the Laplacian
+    # Note: have to do dumb things with x because it is a column vector
+    Lap = (-np.diag(np.power(x.T[0][:-1], 0), -1) - np.diag(np.power(x.T[0][:-1], 0), 1) 
+    	+ 2*np.diag(np.power(x.T[0], 0), 0))/dx/dx
+    Lap[0, 0] = 1/dx/dx
+    Lap[-1, -1] = 1/dx/dx
+
+    P0 = np.zeros((M+1, M+1)).astype(complex)
+    P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + np.matmul(Lap, Lap))
+    P0[M, M] = 1/sigc/sigc
+
+    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(complex)
+    m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
+
+    # Tuning parameters
+    Mint = 1000
+    Mb = 100
+    r = 1.1
+    beta = 1
+    P = np.zeros((M+2, Ns))
+
+    # Define prior
+    SS = np.matmul(spla.sqrtm(Sigma), np.random.randn(M+1, Ns)) + np.tile(m, (1, Ns))
+    print("SS's shape is {}".format(SS.shape))
+    RR = np.concatenate((np.log(1/np.maximum(SS[:M, :], np.full((SS[:M, :]).shape, 
+    	np.finfo(float).eps))), SS[M, :][np.newaxis]), axis=0)
+    mr = 1/Ns*np.sum(RR, axis=1)[np.newaxis].T
+    SP = 1/Ns*np.matmul(RR - np.tile(mr, (1, Ns)), (RR - np.tile(mr, (1, Ns))).T)
+    amp = 100
+    C0 = amp**2 * SP[:M, :M]
+    SR = spla.sqrtm(C0)
+
+    # Initial guess for Sigma from Eq 1.8 in the notes
+    S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
+    	np.concatenate((np.zeros((M, 2)), amp*(1e-2)*np.eye(2)), axis=0)), axis=1).astype(complex)
+    S2 = np.matmul(S, S.T)
+    S1 = np.zeros((M+2, 1)).astype(complex)
+    mm = np.append(mr, r_extra)[np.newaxis].T
+    ppp = mm
+    P0 = np.linalg.inv(C0)
+
+    
 
 def setup_initial(V, i_meas, f=200, V0=6):
     """
@@ -185,19 +333,7 @@ def get_forward_and_reverse(pixelData):
 
     return Vfor, Ifor, Vrev, Irev
 
-# Does math stuff and returns a number relevant to some probability distribution.
-# Used only in doAdaptiveMetropolis()
-def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
-    if pp[-1] > Rmax or pp[-1] < Rmin:
-        return np.inf
-    if pp[-2] > Cmax or pp[-2] < Cmin:
-        return np.inf
-    
-    out = np.linalg.norm(V*np.exp(np.matmul(-A[:, :-1], pp[:-2])) + \
-                         pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
-          np.matmul(np.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
 
-    return out
 
 # This runs through our adaptive metropolis algorithm.
 # Takes in the output of setup_initial().
