@@ -16,7 +16,7 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
-def setup_initial(V, Imeas, f=200, V0=6):
+def setup_initial(V, i_meas, f=200, V0=6):
     """
     Sets up a lot of constants, vectors, and matrices for the computations
     used in the adaptive metropolis algorithm.
@@ -25,14 +25,14 @@ def setup_initial(V, Imeas, f=200, V0=6):
     ----------
     V: dtype
         what it is, general description
-    Imeas:
+    i_meas:
     f: (optional) dtype
         description
     V0: (optional)
         
     Returns
     -------
-    Tuple for adaptive metropolis (ppp, A, V, dV, Imeas, gam, P0, 
+    Tuple for adaptive metropolis (ppp, A, V, dV, i_meas, gam, P0, 
         mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint, A1, m, x)
         
     Notes
@@ -60,7 +60,7 @@ def setup_initial(V, Imeas, f=200, V0=6):
     dt = t[1] - t[0]
     dV = np.diff(V)/dt
     dV = np.append(dV, dV[dV.size-1])
-    N = V.size
+    N = V.size 
     dx = 0.1
     #V0 = max(V)
     x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
@@ -71,7 +71,7 @@ def setup_initial(V, Imeas, f=200, V0=6):
     # max(V) to work properly
     dV = dV[np.newaxis].T
     V = V[np.newaxis].T
-    Imeas = Imeas[np.newaxis].T
+    i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
     A = np.zeros((N, M + 1)).astype(complex)
@@ -110,7 +110,7 @@ def setup_initial(V, Imeas, f=200, V0=6):
     P0[M, M] = 1/sigc/sigc
 
     Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(complex)
-    m = np.matmul(Sigma, np.matmul(A1.T, Imeas)/gam/gam)
+    m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
 
     # Tuning parameters
     Mint = 1000
@@ -139,76 +139,21 @@ def setup_initial(V, Imeas, f=200, V0=6):
     ppp = mm # using p as a variable makes pdb bug out
     P0 = np.linalg.inv(C0)
 
-    return ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint, A1, m, x 
+    return ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint, A1, m, x 
     #N, t, x (these last three are for simple graphs)
 
-# Reads in V and Imeas data from file fileName. Used mainly for testing.
-# Returns fullV and fullImeas as float lists.
-def get_data_from_txt(fileName):
-    # Load in the data
-    with open(fileName) as dataFile:
-        # Reads in the units of the lines
-        firstLine = dataFile.readline().split()
-        # Reads in the data in a Nx2 matrix
-        data = np.array([line.split() for line in dataFile])
-
-    # Parse down the data a bit to speed up calculations
-    fullV = [float(v) for v in data[::4, 0]]
-    fullImeas = [float(i) for i in data[::4, 1]]
-
-    return fullV, fullImeas
-
-# Reads in V and Imeas data from a USIDataset.
-def get_data_from_USID(fileName, pixelNumber):
-    # Open the file
-    h5File = h5py.File(fileName)
-
-    # Grab the main dataset
-    h5Group = h5File["Measurement_000/Channel_000"]
-    h5Main = usid.USIDataset(h5Group["Raw_Data"])
-
-    # Get some more information out of this dataset
-    samp_rate = usid.hdf_utils.get_attr(h5Group, 'IO_samp_rate_[Hz]')
-    ex_freq = usid.hdf_utils.get_attr(h5Group, 'excitation_frequency_[Hz]')
-
-    # Getting ancillary information and other parameters
-    h5_spec_vals = h5Main.h5_spec_vals
-
-    # Excitation waveform for a single line / row of data
-    excit_wfm = h5_spec_vals[()]
-
-    # We expect each pixel to have a single period of the sinusoidal excitation
-    # Calculating the excitation waveform for a single pixel
-    pts_per_cycle = int(np.round(samp_rate/ex_freq))
-    single_AO = excit_wfm[0, :pts_per_cycle]
-
-    # Get excitation amplitude
-    ex_amp = usid.hdf_utils.get_attr(h5Group, 'excitation_amplitude_[V]')
-
-    # Assume that we have already filterd and reshaped the data
-    # Now load in a filtered and reshaped data
-    h5_filt_grp = usid.hdf_utils.find_results_groups(h5Main, "FFT_Filtering")[-1]
-    h5_filt = h5_filt_grp["Filtered_Data"]
-    h5_resh_grp = usid.hdf_utils.find_results_groups(h5_filt, "Reshape")[-1]
-    h5_resh = usid.USIDataset(h5_resh_grp["Reshaped_Data"])
-
-    breakpoint()
-
-    # Just return the voltage and response for now
-    return [float(v) for v in single_AO[::4]], [float(v) for v in h5_resh[pixelNumber, ::4]]
-
-# Takes in the reshaped main USIDatabase and returns V and Imeas data
+# Takes in the reshaped main USIDatabase and returns V and i_meas data
 def get_data_from_reshaped_USID(h5_resh, pixelNumber):
     # Note: h5_resh.file returns h5File. h5_resh_grp does not hold any
     # of the attributes we want for ex_amp and whatnot.
     return [float(v) for v in h5_resh.h5_spec_vals[()][0]][::4], [float(v) for v in h5_resh[pixelNumber, ::4]]
 
-# Takes float lists fullV and fullImeas and splits them into forward
+# Takes float lists fullV and fulli_meas and splits them into forward
 # and reverse directions. Assumes the fullV is a sine wave.
 # Returns Vfor, Ifor, Vrev, Irev as 1D numpy arrays.
 def get_forward_and_reverse(pixelData):
     # Parse our input into what we want.
-    fullV, fullImeas = pixelData
+    fullV, fulli_meas = pixelData
 
     # Since we have a sine wave (which goes up, then down, then up),
     # we want to take the last bit that goes up and move it to the
@@ -219,7 +164,7 @@ def get_forward_and_reverse(pixelData):
         lowestInd -= 1
 
     fullV = fullV[lowestInd:] + fullV[:lowestInd]
-    fullImeas = fullImeas[lowestInd:] + fullImeas[:lowestInd]
+    fulli_meas = fulli_meas[lowestInd:] + fulli_meas[:lowestInd]
 
     # Then we do another walk to get the boundary between the
     # forward and reverse sections.
@@ -230,15 +175,15 @@ def get_forward_and_reverse(pixelData):
     # Finally, we split the data into forward and reverse pieces
     # and return them
     Vfor = np.array(fullV[:forwardEnd]) #+ 1])
-    Ifor = np.array(fullImeas[:forwardEnd])# + 1])
+    Ifor = np.array(fulli_meas[:forwardEnd])# + 1])
     Vrev = np.array(fullV[forwardEnd:])
-    Irev = np.array(fullImeas[forwardEnd:])
+    Irev = np.array(fulli_meas[forwardEnd:])
 
     return Vfor, Ifor, Vrev, Irev
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in doAdaptiveMetropolis()
-def logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
+def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     if pp[-1] > Rmax or pp[-1] < Rmin:
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
@@ -252,7 +197,7 @@ def logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
 
 # This runs through our adaptive metropolis algorithm.
 # Takes in the output of setup_initial().
-# Returns V, dV, Imeas, Ns, M, S, S1, S1lag, P, A for graphing.
+# Returns V, dV, i_meas, Ns, M, S, S1, S1lag, P, A for graphing.
 def do_adaptive_metropolis(metroData):
     """
     What function does
@@ -264,10 +209,10 @@ def do_adaptive_metropolis(metroData):
         
     Returns
     -------
-    Tuple (V, dV, Imeas, Ns, M, S, S1, S1lag, P, A)
+    Tuple (V, dV, i_meas, Ns, M, S, S1, S1lag, P, A)
     V: general description
     dV: 
-    Imeas:
+    i_meas:
     Ns:
     M:
     S:
@@ -282,20 +227,20 @@ def do_adaptive_metropolis(metroData):
 
     """
     # Parse the input into what we want
-    ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint = metroData
+    ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Ns, beta, r, S, S1, S2, M, Mb, Mint = metroData
 
     # Quick setup for adaptive metropolis.
     i = 0
     j = 0
     nacc = 0 # number of accepted proposals
     P = np.zeros((M+2, Ns)).astype(complex) # an array to hold the sample values
-    logpold = logpoR1(ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
+    logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
 
     print("Starting Active Metropolis...")
     metStartTime = time.time()
     while i < Ns:
         pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1))
-        logpnew = logpoR1(pppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
+        logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
 
         # accept or reject
         # Note: unlike Matlab's rand, which is a uniformly distributed selection from (0, 1),
@@ -349,18 +294,26 @@ def do_adaptive_metropolis(metroData):
     print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.".format(time.time() - metStartTime))
 
     # Return statement for simple graphs
-    return V, dV, Imeas, Ns, M, S, S1, S1lag, P, A
+    return V, dV, i_meas, Ns, M, S, S1, S1lag, P, A
 
 # Plots either forward or reverse graphs. Used mainly for testing.
 # Takes in the output of doAdaptiveMetropolis(). Returns nothing.
-def plot_simple_graphs(graphData, metroBits):
-    '''
-    ???
-    graphData: dtype, function, usage???
-    metroBits: ???
-    '''
+def _plot_simple_graph(graphData, metroBits):
+    """
+    Helper function for plotting a simple graph
+    
+    Parameters
+    ----------
+    graph_data: Tuple
+
+    metro_bits: Tuple
+        
+    Notes
+    -----
+    #add any notes needed
+    """
     # Parse the input to what we want.
-    V, dV, Imeas, Ns, M, S, S1, S1lag, P, A = graphData
+    V, dV, i_meas, Ns, M, S, S1, S1lag, P, A = graphData
     x, N, t = metroBits
 
     ACL1 = (S1lag - np.square(S1))/np.diag(np.matmul(S, S.T))[np.newaxis].T
@@ -386,7 +339,7 @@ def plot_simple_graphs(graphData, metroBits):
 
     # Now graph out our results.
     fig101 = plt.figure()
-    plt.plot(V, Imeas, "ro", mfc="none")
+    plt.plot(V, i_meas, "ro", mfc="none")
     plt.plot(V, meanI, "gx")
     nn = min(700, max(t.shape))
     plt.plot(V[:nn], V[:nn]*np.exp(np.matmul(-A[:nn, :M], meani[:M])) + \
@@ -410,39 +363,8 @@ def plot_simple_graphs(graphData, metroBits):
     # Wait here to allow the user to view the graphs
     input("Press <Enter> to continue...")
 
-# Plots the 3 graphs side by side
-def plot_pycroscopy_graphs(fullV, fullImeas, meanr, varr, x, Irec, capacitance):
-    #capacitance = m[-1] / 2
-
-    #dt = 1.0 / (ex_freq * single_AO.size)
-    dt = 0.0001 # temporary substitution
-    #r_extra = 0.110 # also temporary substitution
-    r_extra = .110
-    dvdt = np.diff(fullV) / dt # Use fullV instead of single_AO
-    dvdt = np.append(dvdt, dvdt[-1])
-    point_i_cap = capacitance * dvdt
-    point_i_extra = r_extra * 2 * capacitance * fullV
-    point_i_corr = fullImeas - point_i_cap - point_i_extra
-
-    #point_i_corr *= 0 # Cuz this bad boi isn't working >:(
-
-    # Mean and variance of resistance
-    #meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
-    #mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
-    #varr = mom2r - np.matmul(meanr, meanr.T).astype(complex)
-
-    #Irec = np.matmul(A1, m)
-
-    #breakpoint()
-
-    fig = px.analysis.utils.giv_utils.plot_bayesian_results(fullV, fullImeas, point_i_corr, x.T[0], meanr.T[0], varr, Irec.T[0])
-    fig.show()
-
-    # Wait here to allow the user to view the graphs
-    #input("Press <Enter> to continue...")
-    return fig
  
-def simple_graphs(verbose=False):
+def plot_simple_graphs(verbose=False):
     """
     Main function for plotting a simple graph
     
@@ -457,88 +379,23 @@ def simple_graphs(verbose=False):
     #add any notes needed
     """
 
-    #pixelData = getDataFromTxt("imeas_220.txt")
+    #pixelData = getDataFromTxt("i_meas_220.txt")
     h5Path = "pzt_nanocap_6_split_bayesian_compensation_R_correction.h5"
     pixelData = get_data_from_USID(h5Path, 32444)
 
     Vfor, Ifor, Vrev, Irev = get_forward_and_reverse(pixelData)
 
     # Do the forward direction
-    if self.verbose: print("Going in the forward direction.")
+    if verbose: print("Going in the forward direction.")
     forwardMetroData = setup_initial(Vfor, Ifor)
     forwardGraphData = do_adaptive_metropolis(forwardMetroData[:-5])
     plot_simple_graphs(forwardGraphData, forwardMetroData[-3:])
 
     # Do the reverse direction
-    if self.verbose: print("Going in the reverse direction.")
+    if verbose: print("Going in the reverse direction.")
     reverseMetroData = setup_initial(Vrev, Irev)
     reverseGraphData = do_adaptive_metropolis(reverseMetroData[:-5])
     plot_simple_graphs(reverseGraphData, forwardMetroData[-3:])
 
-    if self.verbose: print("Simple graph plotting complete.")
+    if verbose: print("Simple graph plotting complete.")
 
-def USID_graph(h5_resh, pixelNumber, verbose=False):
-    """
-    Main function for plotting a USID graph
-    
-    Parameters
-    ----------
-    h5_resh: 
-    pixel_number: 
-    verbose: (optional) Boolean
-        set True for verbose
-        for the purpose of debugging
-        
-    Notes
-    -----
-    #add any notes needed
-    """
-
-    pixelData = get_data_from_reshaped_USID(h5_resh, pixelNumber)
-
-    Vfor, Ifor, Vrev, Irev = get_forward_and_reverse(pixelData)
-
-    # Do the forward direction
-    print("Going in the forward direction.")
-    forwardMetroData = setup_initial(Vfor, Ifor)
-    forwardGraphData = do_adaptive_metropolis(forwardMetroData[:-5])
-    #plotSimpleGraphs(forwardGraphData, forwardMetroData[-3:])
-
-    # Do the reverse direction
-    print("Going in the reverse direction.")
-    reverseMetroData = setup_initial(Vrev, Irev)
-    reverseGraphData = do_adaptive_metropolis(reverseMetroData[:-5])
-    #plotSimpleGraphs(reverseGraphData, forwardMetroData[-3:])
-
-    #breakpoint()
-
-    fullV = np.concatenate((Vfor, Vrev))
-    fullImeas = np.concatenate((Ifor, Irev))
-    NsFor = forwardGraphData[3]
-    MFor = forwardGraphData[4]
-    PFor = forwardGraphData[8]
-    NsRev = reverseGraphData[3]
-    MRev = reverseGraphData[4]
-    PRev = reverseGraphData[8]
-
-    # Mean and variance of resistance
-    meanrFor = np.matmul(np.exp(PFor[:MFor, int(NsFor/2):NsFor]), np.ones((int(NsFor/2), 1))) / (NsFor/2)
-    mom2rFor = np.matmul(np.exp(PFor[:MFor, int(NsFor/2):NsFor]), np.exp(PFor[:MFor, int(NsFor/2):NsFor]).T) / (NsFor/2)
-    varrFor = mom2rFor - np.matmul(meanrFor, meanrFor.T).astype(complex)
-    meanrRev = np.matmul(np.exp(PRev[:MRev, int(NsRev/2):NsRev]), np.ones((int(NsRev/2), 1))) / (NsRev/2)
-    mom2rRev = np.matmul(np.exp(PRev[:MRev, int(NsRev/2):NsRev]), np.exp(PRev[:MRev, int(NsRev/2):NsRev]).T) / (NsRev/2)
-    varrRev = mom2rRev - np.matmul(meanrRev, meanrRev.T).astype(complex)
-
-    meanr = np.concatenate((meanrFor, meanrRev))
-    varr = np.concatenate((np.diag(varrFor), np.diag(varrRev)))
-
-    x = np.concatenate((forwardMetroData[-3], -1*reverseMetroData[-3]))
-    IrecFor = np.matmul(forwardMetroData[-5], forwardMetroData[-4])
-    IrecRev = np.matmul(reverseMetroData[-5], reverseMetroData[-4])
-    Irec = np.concatenate((IrecFor, IrecRev))
-    capacitance = (forwardMetroData[-4][-1]+reverseMetroData[-4][-1])[0]/2
-    
-    #breakpoint()
-
-    return plot_pycroscopy_graphs(fullV, fullImeas, meanr, varr, x, Irec, capacitance)
-    #plotPycroscopyGraphs(np.array(pixelData[0]), np.array(pixelData[1]), meanr, varr, x, Irec, capacitance)
