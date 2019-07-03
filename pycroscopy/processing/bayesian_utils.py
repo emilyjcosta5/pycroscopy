@@ -16,6 +16,10 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
+
+def run_bayesian_inference(V )
+
+
 def setup_initial(V, i_meas, f=200, V0=6):
     """
     Sets up a lot of constants, vectors, and matrices for the computations

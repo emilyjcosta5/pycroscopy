@@ -24,10 +24,12 @@ import math
 import scipy.linalg as spla 
 import pycroscopy as px 
 import pyUSID as usid
-from .bayesianTest import USIDMain
-from .bayesianTest import getForwardAndReverseData as gFARD
-from .bayesianTest import setUpConstantsAndInitialConditions as sUCAIC 
-from .bayesianTest import doAdaptiveMetropolis as dAM 
+
+#### change the names of these functions later
+from .bayesian_utils import USIDMain
+from .bayesian_utils import getForwardAndReverseData as gFARD
+from .bayesian_utils import setUpConstantsAndInitialConditions as sUCAIC 
+from .bayesian_utils import doAdaptiveMetropolis as dAM 
 
 
 # TODO: correct implementation of num_pix
@@ -56,7 +58,7 @@ class AdaptiveBayesianInference(Process):
 
         # Name the process
         # Ex. self.process_name = 'FFT_Filtering'
-        self.process_name = 'AdaptiveBayesian'
+        self.process_name = 'Adaptive_Bayesian'
 
         # Honestly no idea what this line does
         self.duplicate_h5_groups, self.partial_h5_groups = self._check_for_duplicates()
