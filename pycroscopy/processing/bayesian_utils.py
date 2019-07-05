@@ -89,8 +89,8 @@ def run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e6), verbose=False):
     dV = np.diff(V)/dt
     dV = np.append(dV, dV[dV.size-1])
     N = V.size 
+    dx = 0.1
     x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
-    dx = x[1] - x[0]
     M = x.size
 
     # Change V and dV into column vectors for computations
