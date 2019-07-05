@@ -52,9 +52,14 @@ class AdaptiveBayesianInference(Process):
         # Ex. if frequency_filters is None and noise_threshold is None:
         #    raise ValueError('Need to specify at least some noise thresholding / frequency filter')
 
+        # This determines how to parse down the data (i.e. used_data = actual_data[::parse_mod]).
+        # If parse_mod == 1, then we use the entire dataset. We may be able to input this as an
+        # argument, but for now this is just to improve maintainability.
+        parse_mod = 4
+
         # Now do some setting of the variables
         # Ex. self.frequency_filters = frequency_filters
-        self.fullV = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::4])
+        self.full_V = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::parse_mod])
 
         # Name the process
         # Ex. self.process_name = 'FFT_Filtering'
@@ -63,10 +68,29 @@ class AdaptiveBayesianInference(Process):
         # Honestly no idea what this line does
         self.duplicate_h5_groups, self.partial_h5_groups = self._check_for_duplicates()
 
+        # Make full_V and num_pixels attributes
+        self.params_dict = dict()
+        self.params_dict["num_pixels"] = self.h5_main[()].shape[0]
+        self.params_dict["full_V"] = self.full_V
+
         self.data = None
         # Add other datasets needs
         # Ex. self.filtered_data = None
+        # These will be the results from the processed chunks
+        self.dividing_ind = None
+        self.x = None
+        self.R = None
+        self.R_sig = None
+        self.i_recon = None
+        self.i_corrected = None
 
+        # These are the actual databases
+        self.h5_dividing_ind = None
+        self.h5_x = None
+        self.h5_R = None
+        self.h5_R_sig = None
+        self.h5_i_recon = None
+        self.h5_i_corrected = None
 
     def test(self, pix_ind=None):
         """
@@ -86,10 +110,10 @@ class AdaptiveBayesianInference(Process):
         if pix_ind is None:
             pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
 
-        full_i_meas = self.h5_resh[pix_ind, ::4]
+        full_i_meas = self.h5_resh[pix_ind, ::parse_mod]
 
         # Return from test function you built seperately (see gmode_utils.test_filter for example)
-        return process_pixel(self.fullV, full_i_meas, graph=True, verbose=True)
+        return process_pixel(self.full_V, full_i_meas, graph=True, verbose=True)
 
     def _create_results_datasets(self):
         """
@@ -100,9 +124,21 @@ class AdaptiveBayesianInference(Process):
 
         self.parms_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
 
+        # Write in our full_V and num_pixels as attributes to this new group
         write_simple_attrs(self.h5_results_grp, self.parms_dict)
 
         assert isinstance(self.h5_results_grp, h5py.Group)
+
+        # Get values for position indices and values
+        h5_pos_inds_new = self.h5_main.h5_pos_inds
+        h5_pos_vals_new = self.h5_main.h5_pos_vals
+
+        self.h5_dividing_ind = h5_results_grp.create_dataset("DividingIndices", shape=(self.h5_main.shape[0], 1024), dtype=np.int)
+        self.h5_x = None
+        self.h5_R = None
+        self.h5_R_sig = None
+        self.h5_i_recon = None
+        self.h5_i_corrected = None
 
         self.h5_main.file.flush()
 

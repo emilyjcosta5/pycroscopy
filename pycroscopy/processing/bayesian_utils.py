@@ -17,6 +17,30 @@ import pycroscopy as px
 import pyUSID as usid 
 
 
+# Takes in the sine full_V wave and finds the index used to shift the waveform into
+# a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
+# index used to split the waveform into forward and reverse sections). It returns
+# both indices as well as a shifted full_V
+def get_shift_and_split_indices(full_V):
+    # Since we have a sine wave (which goes up, then down, then up),
+    # we want to take the last bit that goes up and move it to the
+    # front, such that the data first goes from -6 to 6 V, then
+    # from 6 to -6 V.
+    shift_index = full_V.size - 1
+    while(full_V[shift_index-1] < full_V[shift_index]):
+        shift_index -= 1
+
+    full_V = np.concatenate((full_V[shift_index:] + full_V[:shift_index]))
+
+    # Then we do another walk to get the boundary between the
+    # forward and reverse sections.
+    split_index = 0
+    while(full_V[split_index] < full_V[split_index + 1]):
+        split_index += 1
+
+    return full_V, shift_index, split_index
+
+
 # Takes in a single period of a sine excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
@@ -79,8 +103,8 @@ def _get_forward_and_reverse(full_V, full_i_meas, verbose=False):
 
     # Finally, we split the data into forward and reverse pieces
     # and return them
-    Vfor = full_V[:forward_end + 1]
-    Ifor = full_i_meas[:forward_end + 1]
+    Vfor = full_V[:forward_end]
+    Ifor = full_i_meas[:forward_end]
     Vrev = full_V[forward_end:]
     Irev = full_i_meas[forward_end:]
 
