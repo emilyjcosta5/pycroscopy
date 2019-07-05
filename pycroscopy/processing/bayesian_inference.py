@@ -26,7 +26,7 @@ import pycroscopy as px
 import pyUSID as usid
 
 #### change the names of these functions later
-from .bayesian_utils import USIDMain
+from .bayesian_utils import process_pixel
 from .bayesian_utils import getForwardAndReverseData as gFARD
 from .bayesian_utils import setUpConstantsAndInitialConditions as sUCAIC 
 from .bayesian_utils import doAdaptiveMetropolis as dAM 
@@ -54,7 +54,7 @@ class AdaptiveBayesianInference(Process):
 
         # Now do some setting of the variables
         # Ex. self.frequency_filters = frequency_filters
-        self.fullV = [float(v) for v in self.h5_main.h5_spec_vals[()][0]][::4]
+        self.fullV = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::4])
 
         # Name the process
         # Ex. self.process_name = 'FFT_Filtering'
@@ -86,8 +86,10 @@ class AdaptiveBayesianInference(Process):
         if pix_ind is None:
             pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
 
+        full_i_meas = self.h5_resh[pix_ind, ::4]
+
         # Return from test function you built seperately (see gmode_utils.test_filter for example)
-        return USIDMain(self.h5_resh, pix_ind)
+        return process_pixel(self.fullV, full_i_meas, graph=True, verbose=True)
 
     def _create_results_datasets(self):
         """
