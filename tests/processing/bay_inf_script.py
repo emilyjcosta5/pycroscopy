@@ -1,6 +1,6 @@
 import h5py
 from mpi4py import MPI
-from bayesian_inference import AdaptiveBayesianInference
+from ../../analysis/bayesian_inference import AdaptiveBayesianInference
 
 h5_path = 'pzt_nanocap_6_split_bayesian_compensation_R_correction.h5'
 
