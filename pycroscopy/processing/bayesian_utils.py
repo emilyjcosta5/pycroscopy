@@ -322,8 +322,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
     varr = mom2r - np.matmul(meanr, meanr.T).astype(complex)
 
-    R = meanr
-    R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T
+    R = meanr.astype(np.float)
+    R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
 
     # Reconstruction of the current
     i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
@@ -342,14 +342,20 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
 
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
+    # Clean up R and R_sig for unsuccessfully predicted resistances
+    for i in range(R_sig.size):
+        if (not np.isnan(R_sig[i])) and R_sig[i] > 1000:
+            R_sig[i] = np.nan
+            R[i] = np.nan
+
     # Create the figure to be returned
     result = plt.figure()
 
     # Plot the resistance estimation on the left subplot
     plt.subplot(121)
-    plt.plot(x, R, label="ER")
-    plt.plot(x, R+R_sig, label="ER+\u03C3_R")
-    plt.plot(x, R-R_sig, label="ER-\u03C3_R")
+    plt.plot(x, R, "gx-", label="ER")
+    plt.plot(x, R+R_sig, "rx:" label="ER+\u03C3_R")
+    plt.plot(x, R-R_sig, "rx:" label="ER-\u03C3_R")
     plt.legend()
 
     # Plot the current data on the right subplot
