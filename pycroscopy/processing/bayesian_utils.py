@@ -319,7 +319,7 @@ def _run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e7), verbose=False):
     R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T
 
     # Reconstruction of the current
-    i_recon = np.tile(V, (1, int(Ns/2))) * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
+    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
             np.matmul(np.tile(P[M, int(Ns/2):Ns], (N, 1))*(np.tile(dV, (1, int(Ns/2))) + P[M+1, int(Ns/2):Ns]*np.tile(V, (1, int(Ns/2)))), \
                       np.ones((int(Ns/2), 1))) / (Ns/2)
 
