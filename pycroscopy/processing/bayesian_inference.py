@@ -69,18 +69,17 @@ class AdaptiveBayesianInference(Process):
         # Add other datasets needs
         # Ex. self.filtered_data = None
 
-        # A couple constants we will be using
+        # A couple constants and vectors we will be using
         self.full_V, self.shift_index, self.split_index = get_shift_and_split_indices(self.full_V)
+        self.M, self.dx, self.x = get_M_dx_x(V0=max(full_V), M=25)
 
         # These will be the results from the processed chunks
-        self.x = None
         self.R = None
         self.R_sig = None
         self.i_recon = None
         self.i_corrected = None
 
         # These are the actual databases
-        self.h5_x = None
         self.h5_R = None
         self.h5_R_sig = None
         self.h5_i_recon = None
@@ -92,6 +91,9 @@ class AdaptiveBayesianInference(Process):
         self.params_dict["full_V"] = self.full_V
         self.params_dict["shift_index"] = self.shift_index
         self.params_dict["split_index"] = self.split_index
+        self.params_dict["M"] = self.M
+        self.params_dict["dx"] = self.dx
+        self.params_dict["x"] = self.x
 
     def test(self, pix_ind=None):
         """
@@ -114,7 +116,7 @@ class AdaptiveBayesianInference(Process):
         full_i_meas = get_shifted_response(self.h5_resh[pix_ind, ::self.parse_mod], self.shift_index)
 
         # Return from test function you built seperately (see gmode_utils.test_filter for example)
-        return process_pixel(self.full_V, full_i_meas, graph=True, verbose=True)
+        return process_pixel(self.full_V, full_i_meas, self.split_index, self.M, self.dx, self.x, graph=True, verbose=True)
 
     def _create_results_datasets(self):
         """
@@ -138,9 +140,8 @@ class AdaptiveBayesianInference(Process):
             h5_spec_inds_new = self.h5_main.h5_spec_inds
             h5_spec_vals_new = self.h5_main.h5_spec_vals
 
-        # TBH x can probably just be a single vector. Does not need to be a database...
-        self.h5_x = h5_results_grp.create_dataset("x", shape=(self.h5_main.shape[0], 1024), dtype=np.int)
-        self.h5_R = None
+        # Initialize our datasets
+        self.h5_R = h5_results_grp.create_dataset("R", shape=(self.h5_main.shape[0], 1024), dtype=np.int)
         self.h5_R_sig = None
         self.h5_i_recon = None
         self.h5_i_corrected = None

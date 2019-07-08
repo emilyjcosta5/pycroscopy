@@ -46,10 +46,17 @@ def get_shifted_response(full_i_meas, shift_index):
     return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
 
 
+# Takes in excitation wave amplitude and desired M value. Returns M, dx, and x.
+def get_M_dx_x(V0=6, M=25):
+    dx = 2*V0/(M-2)
+    x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    M = x.size # M may not be the desired value but it will be very close
+    return M, dx, x
+
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_V, full_i_meas, split_index, graph=False, verbose=False):
+def process_pixel(full_V, full_i_meas, split_index, M, dx, x, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -71,8 +78,8 @@ def process_pixel(full_V, full_i_meas, split_index, graph=False, verbose=False):
     Vfor, Ifor, Vrev, Irev = _get_forward_and_reverse(full_V, full_i_meas, verbose=verbose)
 
     # Run the adaptive metropolis on both halves and save the results
-    forward_results = _run_bayesian_inference(Vfor, Ifor, verbose=verbose)
-    reverse_results = _run_bayesian_inference(Vrev, Irev, verbose=verbose)
+    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, verbose=verbose)
+    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, verbose=verbose)
 
     # If we want a graph, we graph our data and return the figure
     if(graph):
@@ -102,7 +109,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     return out
 
 
-def _run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e7), verbose=False):
+def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
     and runs an adaptive metropolis alglrithm on the data. Then calculates the
@@ -146,7 +153,7 @@ def _run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e7), verbose=False):
     # Setup some constants that will be used throughout the code
     Rmax = 100
     Rmin = -1e-6
-    M = 25 # Set a desired value for M
+    #M = 25 # Set a desired value for M
 
     nt = 1000;
     nx = 32;
@@ -164,9 +171,9 @@ def _run_bayesian_inference(V, i_meas, f=200, V0=6, Ns=int(1e7), verbose=False):
     dV = np.diff(V)/dt
     dV = np.append(dV, dV[dV.size-1])
     N = V.size
-    dx = 2*V0/(M-2)
-    x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
-    M = x.size # M may not be the desired value but it will be very close
+    #dx = 2*V0/(M-2)
+    #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    #M = x.size # M may not be the desired value but it will be very close
 
     # Change V and dV into column vectors for computations
     # Note: V has to be a row vector for np.diff(V) and
