@@ -25,13 +25,8 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-<<<<<<< HEAD
-#### change the names of these functions later
-from .bayesian_utils import run_bayesian_inference, ...
-=======
 from .bayesian_utils import get_shift_and_split_indices
 from .bayesian_utils import process_pixel
->>>>>>> fd9f6d25d327c13d403d0e82a91eda5bb5136142
 
 
 # TODO: correct implementation of num_pix
