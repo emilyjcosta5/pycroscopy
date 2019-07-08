@@ -147,10 +147,12 @@ class AdaptiveBayesianInference(Process):
             h5_spec_vals_new = self.h5_main.h5_spec_vals
 
         # Initialize our datasets
-        self.h5_R = h5_results_grp.create_dataset("R", shape=(self.h5_main.shape[0], 1024), dtype=np.int)
-        self.h5_R_sig = None
-        self.h5_i_recon = None
-        self.h5_i_corrected = None
+        # Note, each pixel of the datasets will hold the forward and reverse sweeps concatenated together.
+        # R and R_sig are plotted against [x, -x], and i_recon and i_corrected are plotted against full_V.
+        self.h5_R = h5_results_grp.create_dataset("R", shape=(self.h5_main.shape[0], 2*self.M), dtype=np.float)
+        self.h5_R_sig = h5_results_grp.create_dataset("R_sig", shape=(self.h5_main.shape[0], 2*self.M), dtype=np.float)
+        self.h5_i_recon = h5_results_grp.create_dataset("i_recon", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
+        self.h5_i_corrected = h5_results_grp.create_dataset("i_corrected", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
 
         self.h5_main.file.flush()
 
