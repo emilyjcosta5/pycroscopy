@@ -1,9 +1,9 @@
 #!/bin/bash
 
 ### Set the job name. Your output files will share this name.
-#PBS -N mpiSignalFilter
+#PBS -N BayesianInference
 ### Enter your email address. Errors will be emailed to this address.
-#PBS -M somnaths@ornl.gov
+#PBS -M eju@ornl.gov
 ### Node spec, number of nodes and processors per node that you desire.
 ### One node and 16 cores per node in this case.
 #PBS -l nodes=2:ppn=36
@@ -51,13 +51,11 @@ rm -rf $DATA_NAME
 cp $DATA_PATH $DATA_NAME
 
 ### Copy python files:
-cp $SCRIPTS_PATH/fft.py .
-cp $SCRIPTS_PATH/filter_mpi.py .
-cp $SCRIPTS_PATH/gmode_utils.py .
-cp $SCRIPTS_PATH/mpi_signal_filter.py .
-cp $SCRIPTS_PATH/mpi_process.py .
+cp $SCRIPTS_PATH/bay_inf_script.py .
+cp $SCRIPTS_PATH/bayesian_inference.py .
+cp $SCRIPTS_PATH/bayesian_utils.py .
 
 ls -hl
 
 ### MPI run followed by the name/path of the binary.
-mpiexec --map-by ppr:1:node python -m cProfile -s cumtime filter_mpi.py
+mpiexec --map-by ppr:1:node python -m cProfile -s cumtime bay_inf_script.py
