@@ -77,12 +77,15 @@ class AdaptiveBayesianInference(Process):
         # These will be the results from the processed chunks
         self.R = None
         self.R_sig = None
+        self.capacitance = None
         self.i_recon = None
         self.i_corrected = None
+        self.shifted_i_meas = None
 
         # These are the actual databases
         self.h5_R = None
         self.h5_R_sig = None
+        self.h5_capacitance = None
         self.h5_i_recon = None
         self.h5_i_corrected = None
 
@@ -117,7 +120,7 @@ class AdaptiveBayesianInference(Process):
         full_i_meas = get_shifted_response(self.h5_resh[pix_ind, ::self.parse_mod], self.shift_index)
 
         # Return from test function you built seperately (see gmode_utils.test_filter for example)
-        return process_pixel(self.full_V, full_i_meas, self.split_index, self.M, self.dx, self.x, graph=True, verbose=True)
+        return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, graph=True, verbose=True)
 
     def _create_results_datasets(self):
         """
@@ -146,6 +149,7 @@ class AdaptiveBayesianInference(Process):
         # R and R_sig are plotted against [x, -x], and i_recon and i_corrected are plotted against full_V.
         self.h5_R = h5_results_grp.create_dataset("R", shape=(self.h5_main.shape[0], 2*self.M), dtype=np.float)
         self.h5_R_sig = h5_results_grp.create_dataset("R_sig", shape=(self.h5_main.shape[0], 2*self.M), dtype=np.float)
+        self.h5_capacitance = h5_results_grp.create_dataset("capacitance", shape=(self.h5_main.shape[0], 2), dtype=np.float)
         self.h5_i_recon = h5_results_grp.create_dataset("i_recon", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
         self.h5_i_corrected = h5_results_grp.create_dataset("i_corrected", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
 
@@ -156,6 +160,11 @@ class AdaptiveBayesianInference(Process):
         Extracts references to the existing datasets that hold the results
         """
         # Do not worry to much about this now 
+        self.h5_R = self.h5_results_grp["R"]
+        self.h5_R_sig = self.h5_results_grp["R_sig"]
+        self.h5_capacitance = self.h5_results_grp["capacitance"]
+        self.h5_i_recon = self.h5_results_grp["i_recon"]
+        self.h5_i_corrected = self.h5_results_grp["i_corrected"]
 
     def _write_results_chunk(self):
         """
@@ -166,6 +175,11 @@ class AdaptiveBayesianInference(Process):
 
         # Ex. if self.write_filtered:
         #    self.h5_filtered[pos_in_batch, :] = self.filtered_data
+        self.h5_R[pos_in_batch, :] = self.R
+        self.h5_R_sig[pos_in_batch, :] = self.R_sig
+        self.h5_capacitance[pos_in_batch, :] = self.capacitance
+        self.h5_i_recon[pos_in_batch, :] = self.i_recon
+        self.h5_i_corrected[pos_in_batch, :] = self.i_corrected
 
         # Process class handles checkpointing.
 
@@ -181,6 +195,18 @@ class AdaptiveBayesianInference(Process):
         """
         # This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
         #like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
+        self.shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
+        all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x])
+
+        # Since process_pixel returns a tuple, parse the list of tuples into individual lists
+        # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
+        # and R, R_sig, i_recon, and i_corrected are column vectors, which are funky to work with
+        self.R = np.array([result[0].T[0] for result in all_data]).astype(np.float)
+        self.R_sig = np.array([result[1].T[0] for result in all_data]).astype(np.float)
+        self.capacitance = np.array([result[2] for result in all_data])
+        self.i_recon = np.array([result[3].T[0] for result in all_data]).astype(np.float)
+        self.i_corrected = np.array([result[4].T[0] for result in all_data]).astype(np.float)
+
 
 
 

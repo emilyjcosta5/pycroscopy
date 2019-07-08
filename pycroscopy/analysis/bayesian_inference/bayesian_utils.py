@@ -56,7 +56,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_V, full_i_meas, split_index, M, dx, x, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -83,15 +83,23 @@ def process_pixel(full_V, full_i_meas, split_index, M, dx, x, graph=False, verbo
 
     # If we want a graph, we graph our data and return the figure
     if(graph):
-        x, R, R_sig, capacitance, i_recon, i_corrected = forward_results
+        R, R_sig, capacitance, i_recon, i_corrected = forward_results
         forward_graph = _get_simple_graph(x, R, R_sig, Vfor, Ifor, i_recon, i_corrected)
 
-        x, R, R_sig, capacitance, i_recon, i_corrected = reverse_results
+        R, R_sig, capacitance, i_recon, i_corrected = reverse_results
         reverse_graph = _get_simple_graph(x, R, R_sig, Vrev, Irev, i_recon, i_corrected)
 
         return forward_graph, reverse_graph
     else:
-        return forward_results, reverse_results
+        # Concatenate the forward and reverse results together and return in a tuple
+        # for easier parallel processing
+        # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
+        R = np.concatenate((forward_results[0], reverse_results[0]), axis=0)
+        R_sig = np.concatenate((forward_results[1], reverse_results[1]), axis=0)
+        capacitance = np.array([forward_results[2], reverse_results[2]])
+        i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
+        i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
+        return R, R_sig, capacitance, i_recon, i_corrected
 
 
 # Does math stuff and returns a number relevant to some probability distribution.
@@ -133,8 +141,6 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     Returns
     -------
-    x:              numpy.ndtype column vector
-                    the voltage steps corresponding to R and R_sig
     R:              numpy.ndtype column vector
                     the estimated resistances
     R_sig:          numpy.ndtype column vector
@@ -338,7 +344,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     point_i_extra = r_extra * 2 * capacitance * V
     i_corrected = i_meas - point_i_cap - point_i_extra
 
-    return x, R, R_sig, capacitance, i_recon, i_corrected
+    return R, R_sig, capacitance, i_recon, i_corrected
 
 
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
