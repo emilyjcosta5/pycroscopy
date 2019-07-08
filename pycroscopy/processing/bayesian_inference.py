@@ -26,10 +26,7 @@ import pycroscopy as px
 import pyUSID as usid
 
 #### change the names of these functions later
-from .bayesian_utils import USIDMain
-from .bayesian_utils import getForwardAndReverseData as gFARD
-from .bayesian_utils import setUpConstantsAndInitialConditions as sUCAIC 
-from .bayesian_utils import doAdaptiveMetropolis as dAM 
+from .bayesian_utils import run_bayesian_inference, ...
 
 
 # TODO: correct implementation of num_pix
