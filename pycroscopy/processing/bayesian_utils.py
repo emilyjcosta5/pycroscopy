@@ -30,7 +30,7 @@ def get_shift_and_split_indices(full_V):
     while(full_V[shift_index-1] < full_V[shift_index]):
         shift_index -= 1
 
-    full_V = np.concatenate((full_V[shift_index:] + full_V[:shift_index]))
+    full_V = np.concatenate((full_V[shift_index:], full_V[:shift_index]))
 
     # Then we do another walk to get the boundary between the
     # forward and reverse sections.
@@ -41,13 +41,36 @@ def get_shift_and_split_indices(full_V):
     return full_V, shift_index, split_index
 
 
-# Takes in a single period of a sine excitation wave as full_V and the corresponding
+# Takes in a full_i_meas response and shifts it according to the given shift index
+def get_shifted_response(full_i_meas, shift_index):
+    return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
+
+
+# Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_V, full_i_meas, graph=False, verbose=False):
-    # First, split up our data into forward and reverse sections
+def process_pixel(full_V, full_i_meas, split_index, graph=False, verbose=False):
+    # If verbose, check if full_V and full_i_meas exist and are actually 1D
+    if verbose:
+        if full_V is None:
+            raise Exception("full_V is None")
+        if full_i_meas is None:
+            raise Exception("full_i_meas is None")
+        if len(full_V.shape) != 1:
+            raise Exception("full_V is not one-dimensional. Its shape is {}".format(full_V.shape))
+        if len(full_i_meas.shape) != 1:
+            raise Exception("full_i_meas is not one-dimensional. Its shape is {}".format(full_i_meas.shape))
+        if full_V.size != full_i_meas.size:
+            raise Exception("full_V and full_i_meas do not have the same length. full_V is of length {} while full_i_meas is of length {}".format(full_V.size, full_i_meas.size))
+
+    # Split up our data into forward and reverse sections
+    Vfor = full_V[:split_index]
+    Vrev = full_V[split_index:]
+    Ifor = full_i_meas[:split_index]
+    Irev = full_i_meas[split_index:]
     Vfor, Ifor, Vrev, Irev = _get_forward_and_reverse(full_V, full_i_meas, verbose=verbose)
 
+    # Run the adaptive metropolis on both halves and save the results
     forward_results = _run_bayesian_inference(Vfor, Ifor, verbose=verbose)
     reverse_results = _run_bayesian_inference(Vrev, Irev, verbose=verbose)
 
@@ -62,53 +85,6 @@ def process_pixel(full_V, full_i_meas, graph=False, verbose=False):
         return forward_graph, reverse_graph
     else:
         return forward_results, reverse_results
-
-
-# Takes 1D numpy arrays full_V and full_i_meas and splits them into forward
-# and reverse directions. Assumes the full_V is a sine wave.
-# Returns Vfor, Ifor, Vrev, Irev as 1D numpy arrays.
-def _get_forward_and_reverse(full_V, full_i_meas, verbose=False):
-    # If verbose, check if full_V and full_i_meas exist and are actually 1D
-    if verbose:
-        if full_V is None:
-            raise Exception("full_V is None")
-        if full_i_meas is None:
-            raise Exception("full_i_meas is None")
-        if len(full_V.shape) != 1:
-            raise Exception("full_V is not one-dimensional. Its shape is {}".format(full_V.shape))
-        if len(full_i_meas.shape) != 1:
-            raise Exception("full_i_meas is not one-dimensional. Its shape is {}".format(full_i_meas.shape))
-        if full_V.size != full_i_meas.size:
-            raise Exception("full_V and full_i_meas do not have the same length. full_V is of length {} while full_i_meas is of length {}".format(full_V.size, full_i_meas.size))
-
-    # Since we have a sine wave (which goes up, then down, then up),
-    # we want to take the last bit that goes up and move it to the
-    # front, such that the data first goes from -6 to 6 V, then
-    # from 6 to -6 V.
-    lowest_ind = full_V.size - 1
-    while(full_V[lowest_ind-1] < full_V[lowest_ind]):
-        lowest_ind -= 1
-
-    full_V = np.concatenate((full_V[lowest_ind:] + full_V[:lowest_ind]))
-    full_i_meas = np.concatenate((full_i_meas[lowest_ind:] + full_i_meas[:lowest_ind]))
-
-    # Then we do another walk to get the boundary between the
-    # forward and reverse sections.
-    forward_end = 0
-    while(full_V[forward_end] < full_V[forward_end + 1]):
-        forward_end += 1
-
-    if verbose:
-        print("The maximum voltage is {} at index {}".format(full_V[forward_end], forward_end))
-
-    # Finally, we split the data into forward and reverse pieces
-    # and return them
-    Vfor = full_V[:forward_end]
-    Ifor = full_i_meas[:forward_end]
-    Vrev = full_V[forward_end:]
-    Irev = full_i_meas[forward_end:]
-
-    return Vfor, Ifor, Vrev, Irev
 
 
 # Does math stuff and returns a number relevant to some probability distribution.
