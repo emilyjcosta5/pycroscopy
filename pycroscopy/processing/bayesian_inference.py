@@ -68,6 +68,7 @@ class AdaptiveBayesianInference(Process):
         self.process_name = 'Adaptive_Bayesian'
 
         # Honestly no idea what this line does
+        # This line checks to make sure this data has not already been processed
         self.duplicate_h5_groups, self.partial_h5_groups = self._check_for_duplicates()
 
         self.data = None
