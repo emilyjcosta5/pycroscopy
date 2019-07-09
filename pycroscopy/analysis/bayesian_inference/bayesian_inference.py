@@ -29,26 +29,23 @@ from .bayesian_utils import get_shift_and_split_indices
 from .bayesian_utils import process_pixel
 
 
-# TODO: correct implementation of num_pix
-
-
 class AdaptiveBayesianInference(Process):
-    # Note: this assumes use of reshaped data
-    def __init__(self, h5_main, *args,  **kwargs):
-        """
-        What does this class do?
+    def __init__(self, h5_main, **kwargs):
+	"""   	 
+	Bayesian inference is done on h5py dataset object that has already been filtered
+	and reshaped.
         ----------
         h5_main : h5py.Dataset object
             Dataset to process
-        Specify the parameters and what they do and if they are optional
+      	kwargs : (Optional) dictionary
+            Please see Process class for additional inputs 
         """
-        #
-        super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
+       
+       super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
 
         #now make sure all parameters were inputted correctly
         # Ex. if frequency_filters is None and noise_threshold is None:
         #    raise ValueError('Need to specify at least some noise thresholding / frequency filter')
-
         # This determines how to parse down the data (i.e. used_data = actual_data[::parse_mod]).
         # If parse_mod == 1, then we use the entire dataset. We may be able to input this as an
         # argument, but for now this is just to improve maintainability.
