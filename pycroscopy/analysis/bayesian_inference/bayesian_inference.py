@@ -38,7 +38,7 @@ class AdaptiveBayesianInference(Process):
     h5_main : h5py.Dataset object
         Dataset to process
     kwargs : (Optional) dictionary
-        Please see Process class for additional inputs 
+        Please see Process class for additional inputs
     """   
        super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
 
