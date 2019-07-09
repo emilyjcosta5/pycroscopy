@@ -40,7 +40,7 @@ class AdaptiveBayesianInference(Process):
 		kwargs : (Optional) dictionary
 			Please see Process class for additional inputs
 		"""
-	   super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
+		super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
 
 		#now make sure all parameters were inputted correctly
 		# Ex. if frequency_filters is None and noise_threshold is None:
