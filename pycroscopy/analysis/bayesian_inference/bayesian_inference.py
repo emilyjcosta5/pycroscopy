@@ -177,7 +177,7 @@ class AdaptiveBayesianInference(Process):
 		self.h5_capacitance[pos_in_batch, :] = self.capacitance
 		self.h5_i_recon[pos_in_batch, :] = self.i_recon
 		self.h5_i_corrected[pos_in_batch, :] = self.i_corrected
-	if self.verbose: print("results written back to file")
+		if self.verbose: print("results written back to file")
 		# Process class handles checkpointing.
 
 	def _unit_computation(self, *args, **kwargs):
@@ -203,7 +203,7 @@ class AdaptiveBayesianInference(Process):
 		self.capacitance = np.array([result[2] for result in all_data])
 		self.i_recon = np.array([result[3].T[0] for result in all_data]).astype(np.float)
 		self.i_corrected = np.array([result[4].T[0] for result in all_data]).astype(np.float)
-	if self.verbose: print("chunk computed")
+		if self.verbose: print("chunk computed")
 
 
 
