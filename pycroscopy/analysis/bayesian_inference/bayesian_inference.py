@@ -31,7 +31,7 @@ from .bayesian_utils import process_pixel
 
 class AdaptiveBayesianInference(Process):
     def __init__(self, h5_main, **kwargs):
-	"""   	 
+	"""
 	Bayesian inference is done on h5py dataset object that has already been filtered
 	and reshaped.
         ----------
@@ -50,11 +50,11 @@ class AdaptiveBayesianInference(Process):
         # If parse_mod == 1, then we use the entire dataset. We may be able to input this as an
         # argument, but for now this is just to improve maintainability.
         self.parse_mod = 4
-
+	if self.verbose: print("parsed data")
         # Now do some setting of the variables
         # Ex. self.frequency_filters = frequency_filters
         self.full_V = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::self.parse_mod])
-
+	if self.verbose: print("V set up")
         # Name the process
         # Ex. self.process_name = 'FFT_Filtering'
         self.process_name = 'Adaptive_Bayesian'
@@ -70,7 +70,7 @@ class AdaptiveBayesianInference(Process):
         # A couple constants and vectors we will be using
         self.full_V, self.shift_index, self.split_index = get_shift_and_split_indices(self.full_V)
         self.M, self.dx, self.x = get_M_dx_x(V0=max(full_V), M=25)
-
+	if self.verbose: print("data and variables set up")
         # These will be the results from the processed chunks
         self.R = None
         self.R_sig = None
@@ -78,13 +78,14 @@ class AdaptiveBayesianInference(Process):
         self.i_recon = None
         self.i_corrected = None
         self.shifted_i_meas = None
-
+	
         # These are the actual databases
         self.h5_R = None
         self.h5_R_sig = None
         self.h5_capacitance = None
         self.h5_i_recon = None
         self.h5_i_corrected = None
+	if self.verbose: ("empty results set up")
 
         # Make full_V and num_pixels attributes
         self.params_dict = dict()
@@ -95,7 +96,7 @@ class AdaptiveBayesianInference(Process):
         self.params_dict["M"] = self.M
         self.params_dict["dx"] = self.dx
         self.params_dict["x"] = self.x
-
+	if self.verbose: ("attributes set up")
     def test(self, pix_ind=None):
         """
         Tests the Bayesian inference on a single pixel (randomly chosen unless manually specified) worth of data.
@@ -149,7 +150,7 @@ class AdaptiveBayesianInference(Process):
         self.h5_capacitance = h5_results_grp.create_dataset("capacitance", shape=(self.h5_main.shape[0], 2), dtype=np.float)
         self.h5_i_recon = h5_results_grp.create_dataset("i_recon", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
         self.h5_i_corrected = h5_results_grp.create_dataset("i_corrected", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
-
+	if self.verbose: print("results datasets set up")
         self.h5_main.file.flush()
 
     def _get_existing_datasets(self):
@@ -177,7 +178,7 @@ class AdaptiveBayesianInference(Process):
         self.h5_capacitance[pos_in_batch, :] = self.capacitance
         self.h5_i_recon[pos_in_batch, :] = self.i_recon
         self.h5_i_corrected[pos_in_batch, :] = self.i_corrected
-
+	if self.verbose: print("results written back to file")
         # Process class handles checkpointing.
 
     def _unit_computation(self, *args, **kwargs):
@@ -203,7 +204,7 @@ class AdaptiveBayesianInference(Process):
         self.capacitance = np.array([result[2] for result in all_data])
         self.i_recon = np.array([result[3].T[0] for result in all_data]).astype(np.float)
         self.i_corrected = np.array([result[4].T[0] for result in all_data]).astype(np.float)
-
+	if self.verbose: print("chunk computed")
 
 
 
