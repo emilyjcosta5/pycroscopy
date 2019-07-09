@@ -149,7 +149,7 @@ class AdaptiveBayesianInference(Process):
 		self.h5_capacitance = h5_results_grp.create_dataset("capacitance", shape=(self.h5_main.shape[0], 2), dtype=np.float)
 		self.h5_i_recon = h5_results_grp.create_dataset("i_recon", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
 		self.h5_i_corrected = h5_results_grp.create_dataset("i_corrected", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
-	if self.verbose: print("results datasets set up")
+		if self.verbose: print("results datasets set up")
 		self.h5_main.file.flush()
 
 	def _get_existing_datasets(self):
