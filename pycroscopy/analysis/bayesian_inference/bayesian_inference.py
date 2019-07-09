@@ -31,15 +31,15 @@ from .bayesian_utils import process_pixel
 
 class AdaptiveBayesianInference(Process):
     def __init__(self, h5_main, **kwargs):
-    """
-    Bayesian inference is done on h5py dataset object that has already been filtered
-	and reshaped.
-    ----------
-    h5_main : h5py.Dataset object
-        Dataset to process
-    kwargs : (Optional) dictionary
-        Please see Process class for additional inputs
-    """   
+        """
+        Bayesian inference is done on h5py dataset object that has already been filtered
+        and reshaped.
+        ----------
+        h5_main : h5py.Dataset object
+            Dataset to process
+        kwargs : (Optional) dictionary
+            Please see Process class for additional inputs
+        """
        super(AdaptiveBayesianInference, self).__init__(h5_main, **kwargs)
 
         #now make sure all parameters were inputted correctly
