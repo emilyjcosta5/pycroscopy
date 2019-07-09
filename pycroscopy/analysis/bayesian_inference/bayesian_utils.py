@@ -164,7 +164,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     nt = 1000;
     nx = 32;
 
-    r_extra = 0.110
+    r_extra = 0.674
     ff = 1e0
 
     gam = 0.01
@@ -246,7 +246,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
-        np.concatenate((np.zeros((M, 2)), amp*(1e-2)*np.eye(2)), axis=0)), axis=1).astype(complex)
+        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(complex)
     S2 = np.matmul(S, S.T)
     S1 = np.zeros((M+2, 1)).astype(complex)
     mm = np.append(mr, r_extra)[np.newaxis].T
@@ -260,13 +260,15 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     i = 0
     j = 0
-    Rmax = 100
-    Rmin = -1e-6
-    logpold = _logpo_R1(ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
+    Rmax = 1
+    Rmin = 0
+    Cmax = 10
+    Cmin = 0
+    logpold = _logpo_R1(ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
         pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)) # using pp also makes gdb bug out
-        logpnew = _logpo_R1(pppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Rmax, Rmin)
+        logpnew = _logpo_R1(pppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
         # Note: unlike Matlab's rand, which is a uniformly distributed selection from (0, 1),
@@ -321,7 +323,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - metStartTime, time.time() - startTime))
 
     # m is a column vector, and the last element is the capacitance exponentiated
-    capacitance = math.log(m[-1][0])
+    #capacitance = math.log(m[-1][0])
+    capacitance = pppp[-2][0]
+    r_extra = pppp[-1][0]
 
     # Mean and variance of resistance
     meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
