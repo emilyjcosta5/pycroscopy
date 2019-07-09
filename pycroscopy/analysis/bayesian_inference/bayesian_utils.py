@@ -360,8 +360,8 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Plot the resistance estimation on the left subplot
     plt.subplot(121)
     plt.plot(x, R, "gx-", label="ER")
-    plt.plot(x, R+R_sig, "rx:" label="ER+\u03C3_R")
-    plt.plot(x, R-R_sig, "rx:" label="ER-\u03C3_R")
+    plt.plot(x, R+R_sig, "rx:", label="ER+\u03C3_R")
+    plt.plot(x, R-R_sig, "rx:", label="ER-\u03C3_R")
     plt.legend()
 
     # Plot the current data on the right subplot
