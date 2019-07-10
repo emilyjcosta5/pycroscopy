@@ -46,6 +46,12 @@ def get_shifted_response(full_i_meas, shift_index):
     return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
 
 
+# Takes a shifted array and un-shifts it according to the given shift index
+def get_unshifted_response(full_i_meas, shift_index):
+    new_shift_index = full_i_meas.size - shift_index
+    return np.concatenate((full_i_meas[new_shift_index:], full_i_meas[:new_shift_index]))
+
+
 # Takes in excitation wave amplitude and desired M value. Returns M, dx, and x.
 def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
@@ -56,7 +62,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_i_meas, full_V, split_index, M, dx, x, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -75,7 +81,6 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, graph=False, verbo
     Vrev = full_V[split_index:]
     Ifor = full_i_meas[:split_index]
     Irev = full_i_meas[split_index:]
-    Vfor, Ifor, Vrev, Irev = _get_forward_and_reverse(full_V, full_i_meas, verbose=verbose)
 
     # Run the adaptive metropolis on both halves and save the results
     forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, verbose=verbose)
@@ -99,6 +104,9 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, graph=False, verbo
         capacitance = np.array([forward_results[2], reverse_results[2]])
         i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
         i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
+        # Shift i_recon and i_corrected back to correspond to a sine excitation wave
+        i_recon = get_unshifted_response(i_recon, shift_index)
+        i_corrected = get_unshifted_response(i_corrected, shift_index)
         return R, R_sig, capacitance, i_recon, i_corrected
 
 

@@ -25,8 +25,8 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils import get_shift_and_split_indices
-from bayesian_utils import process_pixel
+from .bayesian_utils import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, \
+	get_M_dx_x
 
 
 class AdaptiveBayesianInference(Process):
@@ -95,6 +95,7 @@ class AdaptiveBayesianInference(Process):
 		self.params_dict["M"] = self.M
 		self.params_dict["dx"] = self.dx
 		self.params_dict["x"] = self.x
+		self.params_dict["parse_mod"] = self.parse_mod
 		if self.verbose: ("attributes set up")
 	def test(self, pix_ind=None):
 		"""
@@ -114,10 +115,10 @@ class AdaptiveBayesianInference(Process):
 		if pix_ind is None:
 			pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
 
-		full_i_meas = get_shifted_response(self.h5_resh[pix_ind, ::self.parse_mod], self.shift_index)
+		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
-		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, graph=True, verbose=True)
+		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, graph=True, verbose=True)
 
 	def _create_results_datasets(self):
 		"""
@@ -126,7 +127,7 @@ class AdaptiveBayesianInference(Process):
 
 		self.h5_results_grp = create_results_group(self.h5_main, self.process_name)
 
-		self.parms_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
+		self.params_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
 
 		# Write in our full_V and num_pixels as attributes to this new group
 		write_simple_attrs(self.h5_results_grp, self.parms_dict)
@@ -134,13 +135,48 @@ class AdaptiveBayesianInference(Process):
 		assert isinstance(self.h5_results_grp, h5py.Group)
 
 		# If we ended up parsing down the data, create new spectral datasets (i.e. smaller full_V's)
+		# By convention, we convert the full_V back to a sine wave.
 		if self.parse_mod != 1:
 			h5_spec_inds_new, h5_spec_vals_new = write_ind_val_dsets(self.h5_results_grp, self.full_V.shape, is_spectral=True)
-			h5_spec_vals_new[()] = self.full_V
+			h5_spec_vals_new[()] = get_unshifted_response(self.full_V, self.shift_index)
 		else:
 			h5_spec_inds_new = self.h5_main.h5_spec_inds
 			h5_spec_vals_new = self.h5_main.h5_spec_vals
 
+		# Also make some new spectroscopic datasets for R and R_sig
+		h5_spec_inds_R, h5_spec_vals_R = write_ind_val_dsets(self.h5_results_grp, 2*self.M, is_spectral=True)
+		h5_spec_vals_R[()] = np.concatenate(x, x)
+
+		# Initialize our datasets
+		# Note by convention, the spectroscopic values are stored as a sine wave
+		# so i_recon and i_corrected are shifted at the end of bayesian_utils.process_pixel
+		# accordingly.
+		self.h5_R = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], 2*self.M), "Resistance", "Resistance",
+									   "GOhms", None, Dimension("Bias", "V", 2*self.M), dtype=np.float,
+									   h5_pos_inds=self.h5_main.h5_pos_inds,
+									   h5_pos_vals=self.h5_main.h5_pos_vals,
+									   h5_spec_inds=h5_spec_inds_R,
+									   h5_spec_vals=h5_spec_vals_R)
+
+		assert isinstance(self.h5_R, USIDataset) # Quick sanity check
+		self.h5_R_sig = create_empty_dataset(self.h5_R, np.float, "R_sig")
+
+		self.h5_capacitance = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], 2), "Capacitance", "Capacitance",
+												 "pF", None, Dimension("Direction", "", 2),
+												 h5_pos_inds=self.h5_main.h5_pos_inds,
+												 h5_pos_vals=self.h5_main.h5_pos_vals,
+												 dtype=np.float, aux_spec_prefix="Cap_Spec_")
+
+		# Not sure what units this should be so tentatively storing it as amps
+		self.h5_i_recon = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], self.full_V.size), "Reconstructed_Current", "Current",
+											 "A", None, Dimension("Bias", "V", self.full_V.size), dtype=np.float,
+											 h5_pos_inds=self.h5_main.h5_pos_inds,
+											 h5_pos_vals=self.h5_main.h5_pos_vals,
+											 h5_spec_inds=h5_spec_inds_new,
+											 h5_spec_vals=h5_spec_vals_new)
+		self.h5_i_corrected = create_empty_dataset(self.h5_i_recon, np.float, "Corrected_Current")
+
+		'''
 		# Initialize our datasets
 		# Note, each pixel of the datasets will hold the forward and reverse sweeps concatenated together.
 		# R and R_sig are plotted against [x, -x], and i_recon and i_corrected are plotted against full_V.
@@ -149,6 +185,8 @@ class AdaptiveBayesianInference(Process):
 		self.h5_capacitance = h5_results_grp.create_dataset("capacitance", shape=(self.h5_main.shape[0], 2), dtype=np.float)
 		self.h5_i_recon = h5_results_grp.create_dataset("i_recon", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
 		self.h5_i_corrected = h5_results_grp.create_dataset("i_corrected", shape=(self.h5_main.shape[0], self.full_V.size), dtype=np.float)
+		'''
+
 		if self.verbose: print("results datasets set up")
 		self.h5_main.file.flush()
 
@@ -159,7 +197,7 @@ class AdaptiveBayesianInference(Process):
 		# Do not worry to much about this now 
 		self.h5_R = self.h5_results_grp["R"]
 		self.h5_R_sig = self.h5_results_grp["R_sig"]
-		self.h5_capacitance = self.h5_results_grp["capacitance"]
+		self.h5_capacitance = self.h5_results_grp["capacitance"] * 1000 # convert from nF to pF
 		self.h5_i_recon = self.h5_results_grp["i_recon"]
 		self.h5_i_corrected = self.h5_results_grp["i_corrected"]
 
@@ -193,7 +231,7 @@ class AdaptiveBayesianInference(Process):
 		# This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
 		#like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
 		self.shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
-		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x])
+		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index])
 
 		# Since process_pixel returns a tuple, parse the list of tuples into individual lists
 		# Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
