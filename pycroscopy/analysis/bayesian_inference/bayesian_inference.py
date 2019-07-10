@@ -25,8 +25,7 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils import get_shift_and_split_indices
-from bayesian_utils import process_pixel
+from bayesian_utils import get_shift_and_split_indices, process_pixel, get_M_dx_x
 
 
 class AdaptiveBayesianInference(Process):
@@ -68,7 +67,7 @@ class AdaptiveBayesianInference(Process):
 
 		# A couple constants and vectors we will be using
 		self.full_V, self.shift_index, self.split_index = get_shift_and_split_indices(self.full_V)
-		self.M, self.dx, self.x = get_M_dx_x(V0=max(full_V), M=25)
+		self.M, self.dx, self.x = get_M_dx_x(V0=max(self.full_V), M=25)
 		if self.verbose: print("data and variables set up")
 		# These will be the results from the processed chunks
 		self.R = None
