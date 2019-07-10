@@ -75,7 +75,6 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, graph=False, verbo
     Vrev = full_V[split_index:]
     Ifor = full_i_meas[:split_index]
     Irev = full_i_meas[split_index:]
-    Vfor, Ifor, Vrev, Irev = _get_forward_and_reverse(full_V, full_i_meas, verbose=verbose)
 
     # Run the adaptive metropolis on both halves and save the results
     forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, verbose=verbose)
@@ -264,11 +263,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Rmin = 0
     Cmax = 10
     Cmin = 0
-    logpold = _logpo_R1(ppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
+    logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
         pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)) # using pp also makes gdb bug out
-        logpnew = _logpo_R1(pppp, A, V, dV, Imeas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
+        logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
         # Note: unlike Matlab's rand, which is a uniformly distributed selection from (0, 1),

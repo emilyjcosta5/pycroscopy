@@ -25,7 +25,7 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils import get_shift_and_split_indices, process_pixel, get_M_dx_x
+from bayesian_utils import get_shift_and_split_indices, process_pixel, get_M_dx_x, get_shifted_response
 
 
 class AdaptiveBayesianInference(Process):
@@ -113,7 +113,7 @@ class AdaptiveBayesianInference(Process):
 		if pix_ind is None:
 			pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
 
-		full_i_meas = get_shifted_response(self.h5_resh[pix_ind, ::self.parse_mod], self.shift_index)
+		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
 		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, graph=True, verbose=True)
@@ -125,7 +125,7 @@ class AdaptiveBayesianInference(Process):
 
 		self.h5_results_grp = create_results_group(self.h5_main, self.process_name)
 
-		self.parms_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
+		self.params_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
 
 		# Write in our full_V and num_pixels as attributes to this new group
 		write_simple_attrs(self.h5_results_grp, self.parms_dict)
