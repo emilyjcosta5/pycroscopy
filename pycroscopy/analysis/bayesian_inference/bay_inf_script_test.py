@@ -15,7 +15,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     h5_resh = h5_f['Measurement_000/Channel_000/Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000/Reshaped_Data']
 
-    abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=int(1e4))
+    abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=int(1e6))
 
     figFor, figRev = abi.test()
 

@@ -197,7 +197,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(complex)
+    A = np.zeros((N, M + 1)).astype(np.complex)
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
@@ -210,7 +210,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(complex)
+    A1 = np.zeros((N, M + 1)).astype(np.complex)
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
@@ -228,11 +228,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(complex)
+    P0 = np.zeros((M+1, M+1)).astype(np.complex)
     P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + np.matmul(Lap, Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(complex)
+    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(np.complex)
     m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
 
     # Tuning parameters
@@ -255,11 +255,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
-        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(complex)
+        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex)
     S2 = np.matmul(S, S.T)
-    S1 = np.zeros((M+2, 1)).astype(complex)
+    S1 = np.zeros((M+2, 1)).astype(np.complex)
     mm = np.append(mr, r_extra)[np.newaxis].T
-    ppp = mm
+    ppp = mm.astype(np.complex)
     P0 = np.linalg.inv(C0)
 
     # Now we are ready to start the active metropolis
@@ -310,7 +310,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         # proposal covariance adaptation
         if (i+1) % Mint == 0:
             if (j+1) == Mint:
-                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T.astype(complex) / j
+                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T.astype(np.complex) / j
             else:
                 S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1)[np.newaxis].T / j
 
@@ -323,7 +323,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
             # decaying regularization
             S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
 
-            if verbose and (i%1e6 == 0): print("i = {}".format(i+1))
+            if verbose and ((i+1)%1e5 == 0):
+                print("i = {}".format(i+1))
 
         i += 1
         j += 1
@@ -339,7 +340,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     # Mean and variance of resistance
     meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
     mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
-    varr = mom2r - np.matmul(meanr, meanr.T).astype(complex)
+    varr = mom2r - np.matmul(meanr, meanr.T).astype(np.complex)
 
     R = meanr.astype(np.float)
     R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
