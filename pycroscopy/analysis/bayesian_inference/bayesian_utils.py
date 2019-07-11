@@ -16,7 +16,6 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
-
 # Takes in the sine full_V wave and finds the index used to shift the waveform into
 # a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
 # index used to split the waveform into forward and reverse sections). It returns
@@ -125,7 +124,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     return out
 
 
-def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
+def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=True):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
     and runs an adaptive metropolis alglrithm on the data. Then calculates the
@@ -283,6 +282,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         # Python's np.random.rand is a uniformly distributed selection from [0, 1), and can
         # therefore be 0 (by a very small probability, but still). Thus, a quick filter must
         # be made to prevent us from trying to evaluate log(0).
+        nacc = 0
         randBoi = np.random.rand()
         while randBoi == 0:
             randBoi = np.random.rand()
@@ -300,8 +300,6 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
                 beta = beta*r
             elif rat < 0.1:
                 beta = beta/r
-            
-            nacc = 0
 
         # Save all samples because why not (this is not necessary and can get large)
         P[:, i] = ppp.T[0]
@@ -322,13 +320,13 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
             # decaying regularization
             S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
 
-            print("i = {}".format(i+1))
+            if verbose and (i%1e6=0): print("i = {}".format(i+1))
 
         i += 1
         j += 1
 
     if verbose:
-        print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - metStartTime, time.time() - startTime))
+        print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - met_start_time, time.time() - start_time))
 
     # m is a column vector, and the last element is the capacitance exponentiated
     #capacitance = math.log(m[-1][0])
