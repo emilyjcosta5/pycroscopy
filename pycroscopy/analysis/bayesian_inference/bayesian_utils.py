@@ -240,6 +240,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Mb = 100
     r = 1.1
     beta = 1
+    nacc = 0
     P = np.zeros((M+2, Ns))
 
     # Define prior
@@ -328,7 +329,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         j += 1
 
     if verbose:
-        print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - metStartTime, time.time() - startTime))
+        print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - met_start_time, time.time() - start_time))
 
     # m is a column vector, and the last element is the capacitance exponentiated
     #capacitance = math.log(m[-1][0])
