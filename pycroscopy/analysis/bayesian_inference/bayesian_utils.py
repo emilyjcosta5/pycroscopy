@@ -239,6 +239,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Mb = 100
     r = 1.1
     beta = 1
+    nacc = 0
     P = np.zeros((M+2, Ns))
 
     # Define prior
