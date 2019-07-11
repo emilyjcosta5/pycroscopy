@@ -58,6 +58,7 @@ def get_M_dx_x(V0=6, M=25):
     M = x.size # M may not be the desired value but it will be very close
     return M, dx, x
 
+
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
@@ -82,8 +83,8 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     Irev = full_i_meas[split_index:]
 
     # Run the adaptive metropolis on both halves and save the results
-    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, verbose=verbose)
-    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, verbose=verbose)
+    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, verbose=verbose)
+    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, verbose=verbose)
 
     # If we want a graph, we graph our data and return the figure
     if(graph):
