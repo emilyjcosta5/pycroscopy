@@ -61,7 +61,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -124,7 +124,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     return out
 
 
-def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=True):
+def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
     and runs an adaptive metropolis alglrithm on the data. Then calculates the
@@ -283,7 +283,6 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         # Python's np.random.rand is a uniformly distributed selection from [0, 1), and can
         # therefore be 0 (by a very small probability, but still). Thus, a quick filter must
         # be made to prevent us from trying to evaluate log(0).
-        nacc = 0
         randBoi = np.random.rand()
         while randBoi == 0:
             randBoi = np.random.rand()
@@ -301,6 +300,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
                 beta = beta*r
             elif rat < 0.1:
                 beta = beta/r
+
+            nacc = 0
 
         # Save all samples because why not (this is not necessary and can get large)
         P[:, i] = ppp.T[0]

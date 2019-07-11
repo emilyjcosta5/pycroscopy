@@ -29,7 +29,7 @@ from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shift
 
 
 class AdaptiveBayesianInference(Process):
-	def __init__(self, h5_main, **kwargs):
+	def __init__(self, h5_main, f=200, V0=None, Ns=int(1e7), **kwargs):
 		"""
 		Bayesian inference is done on h5py dataset object that has already been filtered
 		and reshaped.
@@ -67,7 +67,12 @@ class AdaptiveBayesianInference(Process):
 
 		# A couple constants and vectors we will be using
 		self.full_V, self.shift_index, self.split_index = get_shift_and_split_indices(self.full_V)
-		self.M, self.dx, self.x = get_M_dx_x(V0=max(self.full_V), M=25)
+		if V0 is None:
+			V0 = max(self.full_V)
+		self.M, self.dx, self.x = get_M_dx_x(V0=V0, M=25)
+		self.V0 = V0
+		self.f = f
+		self.Ns = Ns
 		if self.verbose: print("data and variables set up")
 		# These will be the results from the processed chunks
 		self.R = None
@@ -87,8 +92,11 @@ class AdaptiveBayesianInference(Process):
 
 		# Make full_V and num_pixels attributes
 		self.params_dict = dict()
+		self.params_dict["Ns"] = self.Ns
 		self.params_dict["num_pixels"] = self.h5_main[()].shape[0]
 		self.params_dict["full_V"] = self.full_V
+		self.params_dict["V0"] = self.V0
+		self.params_dict["freq"] = self.f
 		self.params_dict["shift_index"] = self.shift_index
 		self.params_dict["split_index"] = self.split_index
 		self.params_dict["M"] = self.M
@@ -117,7 +125,7 @@ class AdaptiveBayesianInference(Process):
 		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
-		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, graph=True, verbose=True)
+		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, f=self.f, V0=self.V0, Ns=self.Ns, graph=True, verbose=True)
 
 	def _create_results_datasets(self):
 		"""
@@ -230,7 +238,7 @@ class AdaptiveBayesianInference(Process):
 		# This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
 		#like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
 		self.shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
-		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index])
+		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns])
 
 		# Since process_pixel returns a tuple, parse the list of tuples into individual lists
 		# Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
