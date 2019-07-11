@@ -320,7 +320,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
             # decaying regularization
             S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
 
-            if verbose and (i%1e6=0): print("i = {}".format(i+1))
+            if verbose and (i%1e6 == 0): print("i = {}".format(i+1))
 
         i += 1
         j += 1
