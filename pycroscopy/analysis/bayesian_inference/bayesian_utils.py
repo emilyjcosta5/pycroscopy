@@ -62,7 +62,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, dvdt, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -81,10 +81,12 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     Vrev = full_V[split_index:]
     Ifor = full_i_meas[:split_index]
     Irev = full_i_meas[split_index:]
+    dvdtFor = dvdt[:split_index]
+    dvdtRev = dvdt[split_index:]
 
     # Run the adaptive metropolis on both halves and save the results
-    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, verbose=verbose)
-    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, verbose=verbose)
+    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, dvdtFor, verbose=verbose)
+    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, dvdtRev, verbose=verbose)
 
     # If we want a graph, we graph our data and return the figure
     if(graph):
@@ -125,7 +127,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     return out
 
 
-def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
+def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
     and runs an adaptive metropolis alglrithm on the data. Then calculates the
@@ -351,12 +353,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
                       np.ones((int(Ns/2), 1))) / (Ns/2)
 
     # Adjusting for capacitance
-    dt = 1.0/(f*V.size)
-    dvdt = np.diff(V.T[0])/dt
-    dvdt = np.append(dvdt, dvdt[-1])[np.newaxis].T
     point_i_cap = capacitance * dvdt
     point_i_extra = r_extra * 2 * capacitance * V
     i_corrected = i_meas - point_i_cap - point_i_extra
+
+    #breakpoint()
 
     return R, R_sig, capacitance, i_recon, i_corrected
 
@@ -367,6 +368,8 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
         if (not np.isnan(R_sig[i])) and R_sig[i] > 1000:
             R_sig[i] = np.nan
             R[i] = np.nan
+
+    #breakpoint()
 
     # Create the figure to be returned
     result = plt.figure()

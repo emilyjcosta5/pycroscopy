@@ -51,7 +51,13 @@ class AdaptiveBayesianInference(Process):
 		if self.verbose: print("parsed data")
 		# Now do some setting of the variables
 		# Ex. self.frequency_filters = frequency_filters
-		self.full_V = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::self.parse_mod])
+		#breakpoint()
+		ex_wave = self.h5_main.h5_spec_vals[()]
+		dt = 1.0/(f*ex_wave.size)
+		self.dvdt = np.diff(ex_wave)/dt
+		self.dvdt = np.append(self.dvdt, self.dvdt[0][-1])
+		self.dvdt = self.dvdt[::self.parse_mod][np.newaxis].T
+		self.full_V = ex_wave[0][::self.parse_mod]
 		if self.verbose: print("V set up")
 		# Name the process
 		# Ex. self.process_name = 'FFT_Filtering'
@@ -67,6 +73,7 @@ class AdaptiveBayesianInference(Process):
 
 		# A couple constants and vectors we will be using
 		self.full_V, self.shift_index, self.split_index = get_shift_and_split_indices(self.full_V)
+		self.dvdt = get_shifted_response(self.dvdt, self.shift_index)
 		if V0 is None:
 			V0 = max(self.full_V)
 		self.M, self.dx, self.x = get_M_dx_x(V0=V0, M=25)
@@ -94,6 +101,7 @@ class AdaptiveBayesianInference(Process):
 		self.params_dict = dict()
 		self.params_dict["Ns"] = self.Ns
 		self.params_dict["num_pixels"] = self.h5_main[()].shape[0]
+		self.params_dict["dvdt"] = self.dvdt
 		self.params_dict["full_V"] = self.full_V
 		self.params_dict["V0"] = self.V0
 		self.params_dict["freq"] = self.f
@@ -125,7 +133,7 @@ class AdaptiveBayesianInference(Process):
 		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
-		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, f=self.f, V0=self.V0, Ns=self.Ns, graph=True, verbose=True)
+		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, graph=True, verbose=True)
 
 	def _create_results_datasets(self):
 		"""
@@ -238,7 +246,8 @@ class AdaptiveBayesianInference(Process):
 		# This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
 		#like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
 		self.shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
-		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores, func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns])
+		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores,
+									func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt])
 
 		# Since process_pixel returns a tuple, parse the list of tuples into individual lists
 		# Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
