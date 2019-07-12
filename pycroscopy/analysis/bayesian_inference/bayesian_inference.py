@@ -25,7 +25,7 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, 	get_M_dx_x
+from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, get_M_dx_x
 
 
 class AdaptiveBayesianInference(Process):
@@ -51,6 +51,11 @@ class AdaptiveBayesianInference(Process):
 		if self.verbose: print("parsed data")
 		# Now do some setting of the variables
 		# Ex. self.frequency_filters = frequency_filters
+		ex_wave = self.h5_main.h5_spec_vals[()]
+		breakpoint()
+		dt = 1.0/(f*ex_wave.size)
+		dvdt = np.diff(ex_wave)/dt
+		self.dvdt = np.append(dvdt, dvdt[-1])[np.newaxis].T
 		self.full_V = np.array([float(v) for v in self.h5_main.h5_spec_vals[()][0]][::self.parse_mod])
 		if self.verbose: print("V set up")
 		# Name the process

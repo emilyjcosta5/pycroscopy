@@ -16,6 +16,8 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
+from numba import jit
+
 # Takes in the sine full_V wave and finds the index used to shift the waveform into
 # a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
 # index used to split the waveform into forward and reverse sections). It returns
@@ -54,7 +56,7 @@ def get_unshifted_response(full_i_meas, shift_index):
 # Takes in excitation wave amplitude and desired M value. Returns M, dx, and x.
 def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
-    x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    x = np.arange(-V0, V0+dx, dx).reshape((-1, 1))
     M = x.size # M may not be the desired value but it will be very close
     return M, dx, x
 
@@ -112,19 +114,21 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in the while loop of run_bayesian_inference() (and once before to initialize)
+@jit(nopython=True)
 def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     if pp[-1] > Rmax or pp[-1] < Rmin:
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
         return np.inf
     
-    out = np.linalg.norm(V*np.exp(np.matmul(-A[:, :-1], pp[:-2])) + \
+    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) + \
                          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
-          np.matmul(np.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
+          (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))/2
 
     return out
 
 
+@jit(nopython=True)
 def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
@@ -161,8 +165,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
                     the measured current corrected for capacitance
     '''
     # Grab the start time so we can see how long this takes
-    if(verbose):
-        start_time = time.time()
+#    if(verbose):
+#        start_time = time.time()
 
     # Setup some constants that will be used throughout the code
     Rmax = 100
@@ -183,41 +187,41 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     t = np.linspace(0, tmax, V.size)
     dt = t[1] - t[0]
     dV = np.diff(V)/dt
-    dV = np.append(dV, dV[dV.size-1])
+    dV = np.concatenate((dV, np.array([dV[dV.size-1]])))
     N = V.size
     #dx = 2*V0/(M-2)
-    #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    #x = np.arange(-V0, V0+dx, dx).reshape((-1, 1))
     #M = x.size # M may not be the desired value but it will be very close
 
     # Change V and dV into column vectors for computations
     # Note: V has to be a row vector for np.diff(V) and
     # max(V) to work properly
-    dV = dV[np.newaxis].T
-    V = V[np.newaxis].T
-    i_meas = i_meas[np.newaxis].T
+    dV = dV.reshape((-1, 1))
+    V = V.reshape((-1, 1))
+    i_meas = i_meas.reshape((-1, 1)).astype(np.complex64)
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(np.complex)
+    A = np.zeros((N, M + 1)).astype(np.complex64)
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
-        ix = math.floor((V[j] + V0)/dx) + 1
-        ix = min(ix, x.size - 1)
-        ix = max(ix, 1)
-        A[j, ix] = (V[j] - x[ix-1])/(x[ix] - x[ix-1])
-        A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
+        ix = int((V[j][0] + V0)/dx) + 1
+        ix = np.array([ix, x.size - 1]).min()
+        ix = np.array([ix, 1]).max()
+        A[j, ix] = (V[j][0] - x[ix-1][0])/(x[ix][0] - x[ix-1][0])
+        A[j, ix-1] = (1 - (V[j][0] - x[ix-1][0])/(x[ix][0] - x[ix-1][0]));
     A[:, M] = (dV + ff*r_extra*V).T # take the transpose cuz python is dumb
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(np.complex)
+    A1 = np.zeros((N, M + 1)).astype(np.complex64)
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
-        ix = math.floor((V[j] + V0)/dx)+1
+        ix = math.floor((V[j][0] + V0)/dx)+1
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
-        A1[j, ix] = V[j]*(V[j] - x[ix-1])/(x[ix] - x[ix-1])
-        A1[j, ix-1] = V[j]*(1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]))
+        A1[j, ix] = V[j][0]*(V[j][0] - x[ix-1][0])/(x[ix][0] - x[ix-1][0])
+        A1[j, ix-1] = V[j][0]*(1 - (V[j][0] - x[ix-1][0])/(x[ix][0] - x[ix-1][0]))
     A1[:, M] = (dV + ff*r_extra*V).T # transpose again here
 
     # A rough guess for the initial condition is a bunch of math stuff
@@ -228,12 +232,12 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(np.complex)
-    P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + np.matmul(Lap, Lap))
+    P0 = np.zeros((M+1, M+1)).astype(np.complex64)
+    P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + (Lap @ Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(np.complex)
-    m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
+    Sigma = np.linalg.inv((A1.T @ A1)/gam/gam + P0).astype(np.complex64)
+    m = (Sigma @ (A1.T @ i_meas)/gam/gam)
 
     # Tuning parameters
     Mint = 1000
@@ -244,28 +248,28 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     P = np.zeros((M+2, Ns))
 
     # Define prior
-    SS = np.matmul(spla.sqrtm(Sigma), np.random.randn(M+1, Ns)) + np.tile(m, (1, Ns))
+    SS = (spla.sqrtm(Sigma) @ np.random.randn(M+1, Ns).astype(np.complex64)) + np.tile(m, (1, Ns))
     RR = np.concatenate((np.log(1/np.maximum(SS[:M, :], np.full((SS[:M, :]).shape, 
         np.finfo(float).eps))), SS[M, :][np.newaxis]), axis=0)
-    mr = 1/Ns*np.sum(RR, axis=1)[np.newaxis].T
-    SP = 1/Ns*np.matmul(RR - np.tile(mr, (1, Ns)), (RR - np.tile(mr, (1, Ns))).T)
+    mr = 1/Ns*np.sum(RR, axis=1).reshape((-1, 1))
+    SP = 1/Ns*((RR - np.tile(mr, (1, Ns))) @ (RR - np.tile(mr, (1, Ns))).T)
     amp = 100
     C0 = amp**2 * SP[:M, :M]
     SR = spla.sqrtm(C0)
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
-        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex)
-    S2 = np.matmul(S, S.T)
-    S1 = np.zeros((M+2, 1)).astype(np.complex)
-    mm = np.append(mr, r_extra)[np.newaxis].T
-    ppp = mm.astype(np.complex)
+        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex64)
+    S2 = (S @ S.T)
+    S1 = np.zeros((M+2, 1)).astype(np.complex64)
+    mm = np.concatenate((mr, np.array([r_extra]))).reshape((-1, 1))
+    ppp = mm.astype(np.complex64)
     P0 = np.linalg.inv(C0)
 
     # Now we are ready to start the active metropolis
     if verbose:
         print("Starting active metropolis...")
-        met_start_time = time.time()
+#        met_start_time = time.time()
 
     i = 0
     j = 0
@@ -276,7 +280,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
-        pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)) # using pp also makes gdb bug out
+        pppp = ppp + beta*(S @ np.random.randn(M+2, 1)) # using pp also makes gdb bug out
         logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
@@ -310,18 +314,18 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         # proposal covariance adaptation
         if (i+1) % Mint == 0:
             if (j+1) == Mint:
-                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T.astype(np.complex) / j
+                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1).reshape((-1, 1)).astype(np.complex64) / j
             else:
-                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1)[np.newaxis].T / j
+                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1).reshape((-1, 1)) / j
 
             # Update meani based on Mint batch
-            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, i-Mint+1:i+1], axis=1)[np.newaxis].T/(j+1)
+            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, i-Mint+1:i+1], axis=1).reshape((-1, 1))/(j+1)
             # Update Sigma based on Mint batch
-            S2 = (j+1-Mint)/(j+1)*S2 + np.matmul(P[:, i-Mint+1:i+1], P[:, i-Mint+1:i+1].T)/(j+1)
+            S2 = (j+1-Mint)/(j+1)*S2 + (P[:, i-Mint+1:i+1] @ P[:, i-Mint+1:i+1].T)/(j+1)
             #print("P's shape is {}".format(P.shape))
             # Approximate L such that L*L' = Sigma, where the second term is a
             # decaying regularization
-            S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
+            S = np.linalg.cholesky(S2 - (S1 @ S1.T) + (1e-3)*np.eye(M+2)/(j+1))
 
             if verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
@@ -330,7 +334,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         j += 1
 
     if verbose:
-        print("Finished Adaptive Metropolis!\nAdaptive Metropolis took {}.\nTotal time taken so far is {}.".format(time.time() - met_start_time, time.time() - start_time))
+        print("Finished Adaptive Metropolis!")
+#        print("Adaptive Metropolis took", time.time() - met_start_time,"\nTotal time taken so far is", time.time() - start_time)
 
     # m is a column vector, and the last element is the capacitance exponentiated
     #capacitance = math.log(m[-1][0])
@@ -338,22 +343,22 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     r_extra = pppp[-1][0]
 
     # Mean and variance of resistance
-    meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
-    mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
-    varr = mom2r - np.matmul(meanr, meanr.T).astype(np.complex)
+    meanr = (np.exp(P[:M, int(Ns/2):Ns]) @ np.ones((int(Ns/2), 1))) / (Ns/2)
+    mom2r = (np.exp(P[:M, int(Ns/2):Ns]) @ np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
+    varr = mom2r - (meanr @ meanr.T).astype(np.complex64)
 
     R = meanr.astype(np.float)
-    R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
+    R_sig = np.sqrt(np.diag(varr[:M, :M])).reshape((-1, 1)).astype(np.float)
 
     # Reconstruction of the current
-    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
-            np.matmul(np.tile(P[M, int(Ns/2):Ns], (N, 1))*(np.tile(dV, (1, int(Ns/2))) + P[M+1, int(Ns/2):Ns]*np.tile(V, (1, int(Ns/2)))), \
-                      np.ones((int(Ns/2), 1))) / (Ns/2)
+    i_recon = V * (np.exp(-A[:, :M] @ P[:M, int(Ns/2):Ns]) @ np.ones((int(Ns/2), 1))) / (Ns/2) + \
+              (np.tile(P[M, int(Ns/2):Ns], (N, 1))*(np.tile(dV, (1, int(Ns/2))) + P[M+1, int(Ns/2):Ns]*np.tile(V, (1, int(Ns/2)))) @ \
+               np.ones((int(Ns/2), 1))) / (Ns/2)
 
     # Adjusting for capacitance
     dt = 1.0/(f*V.size)
     dvdt = np.diff(V.T[0])/dt
-    dvdt = np.append(dvdt, dvdt[-1])[np.newaxis].T
+    dvdt = np.concatenate((dvdt, np.array([dvdt[-1]]))).reshape((-1, 1))
     point_i_cap = capacitance * dvdt
     point_i_extra = r_extra * 2 * capacitance * V
     i_corrected = i_meas - point_i_cap - point_i_extra
