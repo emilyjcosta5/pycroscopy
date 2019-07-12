@@ -25,7 +25,7 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, 	get_M_dx_x
+from bayesian_utils_small import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, 	get_M_dx_x
 
 
 class AdaptiveBayesianInference(Process):

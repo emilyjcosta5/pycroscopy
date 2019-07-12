@@ -167,14 +167,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         start_time = time.time()
 
     # Setup some constants that will be used throughout the code
-    Rmax = 100
-    Rmin = -1e-6
-    #M = 25 # Set a desired value for M
-
     nt = 1000;
     nx = 32;
 
-    r_extra = 0.674
+    r_extra = 110
     ff = 1e0
 
     gam = 0.01
@@ -245,7 +241,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     nacc = 0
     #P = np.zeros((M+2, Ns))
     # Only store a million samples to save space
-    num_samples = int(1e6)
+    num_samples = min(Ns, int(1e6))
     P = np.zeros((M+2, num_samples))
 
     # Define prior
@@ -274,8 +270,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     i = 0
     j = 0
-    Rmax = 1
-    Rmin = 0
+    Rmax = 120
+    Rmin = 100
     Cmax = 10
     Cmin = 0
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
@@ -349,8 +345,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     r_extra = pppp[-1][0]
 
     # Mean and variance of resistance
-    meanr = np.matmul(np.exp(P[:M, num_samples]), np.ones((num_samples, 1))) / num_samples
-    mom2r = np.matmul(np.exp(P[:M, num_samples]), np.exp(P[:M, num_samples]).T) / num_samples
+    meanr = np.matmul(np.exp(P[:M,:]), np.ones((num_samples, 1))) / num_samples
+    mom2r = np.matmul(np.exp(P[:M,:]), np.exp(P[:M,:]).T) / num_samples
     varr = mom2r - np.matmul(meanr, meanr.T).astype(np.complex)
 
     R = meanr.astype(np.float)
@@ -358,7 +354,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     # Reconstruction of the current
     i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, :])), np.ones((num_samples, 1))) / (num_samples) + \
-            np.matmul(np.tile(P[M, num_samples], (N, 1))*(np.tile(dV, (1, num_samples)) + P[M+1, :]*np.tile(V, (1, num_samples))), \
+            np.matmul(np.tile(P[M,:], (N, 1))*(np.tile(dV, (1, num_samples)) + P[M+1, :]*np.tile(V, (1, num_samples))), \
                       np.ones((num_samples, 1))) / num_samples
 
     # Adjusting for capacitance
@@ -374,7 +370,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(R_sig.size):
-        if (not np.isnan(R_sig[i])) and R_sig[i] > 1000:
+        if np.isnan(R_sig[i]) or R_sig[i] > 100:
             R_sig[i] = np.nan
             R[i] = np.nan
 

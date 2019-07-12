@@ -362,7 +362,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(R_sig.size):
-        if (not np.isnan(R_sig[i])) and R_sig[i] > 1000:
+        if np.isnan(R_sig[i]) or R_sig[i] > 1000:
             R_sig[i] = np.nan
             R[i] = np.nan
 
