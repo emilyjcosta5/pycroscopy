@@ -167,10 +167,14 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         start_time = time.time()
 
     # Setup some constants that will be used throughout the code
+    Rmax = 100
+    Rmin = -1e-6
+    #M = 25 # Set a desired value for M
+
     nt = 1000;
     nx = 32;
 
-    r_extra = 110
+    r_extra = 0.674
     ff = 1e0
 
     gam = 0.01
@@ -239,7 +243,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     r = 1.1
     beta = 1
     nacc = 0
-    P = np.zeros((M+2, Ns))
+    #P = np.zeros((M+2, Ns))
+    # Only store a million samples to save space
+    num_samples = int(1e6)
+    P = np.zeros((M+2, num_samples))
 
     # Define prior
     SS = np.matmul(spla.sqrtm(Sigma), np.random.randn(M+1, Ns)) + np.tile(m, (1, Ns))
@@ -267,8 +274,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     i = 0
     j = 0
-    Rmax = 120
-    Rmin = 100
+    Rmax = 1
+    Rmin = 0
     Cmax = 10
     Cmin = 0
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
@@ -302,20 +309,26 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
             nacc = 0
 
-        # Save all samples because why not (this is not necessary and can get large)
-        P[:, i] = ppp.T[0]
+        # Save only the last num_samples samples to save space
+        P[:, i%num_samples] = ppp.T[0]
 
         # proposal covariance adaptation
         if (i+1) % Mint == 0:
+            # Get index values to fit into the smaller matrix
+            jMintStart = (j-Mint)%num_samples
+            jMintEnd = j%num_samples
+            iMintStart = (i-Mint+1)%num_samples
+            iMintEnd = (i+1)%num_samples
+
             if (j+1) == Mint:
                 S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T.astype(np.complex) / j
             else:
-                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1)[np.newaxis].T / j
+                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, jMintStart:jMintEnd] * P[:, jMintStart+1:jMintEnd+1], axis=1)[np.newaxis].T / j
 
             # Update meani based on Mint batch
-            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, i-Mint+1:i+1], axis=1)[np.newaxis].T/(j+1)
+            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, iMintStart:iMintEnd], axis=1)[np.newaxis].T/(j+1)
             # Update Sigma based on Mint batch
-            S2 = (j+1-Mint)/(j+1)*S2 + np.matmul(P[:, i-Mint+1:i+1], P[:, i-Mint+1:i+1].T)/(j+1)
+            S2 = (j+1-Mint)/(j+1)*S2 + np.matmul(P[:, iMintStart:iMintEnd], P[:, iMintStart:iMintEnd].T)/(j+1)
             #print("P's shape is {}".format(P.shape))
             # Approximate L such that L*L' = Sigma, where the second term is a
             # decaying regularization
@@ -334,20 +347,19 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     #capacitance = math.log(m[-1][0])
     capacitance = pppp[-2][0]
     r_extra = pppp[-1][0]
-    print("inferred r_extra is {}".format(pppp[-1][0]))
 
     # Mean and variance of resistance
-    meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
-    mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
+    meanr = np.matmul(np.exp(P[:M, num_samples]), np.ones((num_samples, 1))) / num_samples
+    mom2r = np.matmul(np.exp(P[:M, num_samples]), np.exp(P[:M, num_samples]).T) / num_samples
     varr = mom2r - np.matmul(meanr, meanr.T).astype(np.complex)
 
     R = meanr.astype(np.float)
     R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
 
     # Reconstruction of the current
-    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
-            np.matmul(np.tile(P[M, int(Ns/2):Ns], (N, 1))*(np.tile(dV, (1, int(Ns/2))) + P[M+1, int(Ns/2):Ns]*np.tile(V, (1, int(Ns/2)))), \
-                      np.ones((int(Ns/2), 1))) / (Ns/2)
+    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, :])), np.ones((num_samples, 1))) / (num_samples) + \
+            np.matmul(np.tile(P[M, num_samples], (N, 1))*(np.tile(dV, (1, num_samples)) + P[M+1, :]*np.tile(V, (1, num_samples))), \
+                      np.ones((num_samples, 1))) / num_samples
 
     # Adjusting for capacitance
     point_i_cap = capacitance * dvdt
@@ -368,12 +380,6 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
 
     #breakpoint()
 
-    '''
-    resh_point = np.loadtxt("resh_point.txt")
-    point_i_corr = np.loadtxt("point_i_corr.txt")
-    single_AO = np.loadtxt("single_AO.txt")
-    '''
-
     # Create the figure to be returned
     result = plt.figure()
 
@@ -387,10 +393,8 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Plot the current data on the right subplot
     plt.subplot(122)
     plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
-    plt.plot(V, i_recon, "gx", label="i_recon")
+    plt.plot(V, i_recon, "gx-", label="i_recon")
     plt.plot(V, i_corrected, "bo", label="i_corrected")
-    #plt.plot(single_AO, resh_point, "k--", label="old_resh_point")
-    #plt.plot(single_AO, point_i_corr, "k:", label="old_i_corrected")
     plt.legend()
 
     return result
