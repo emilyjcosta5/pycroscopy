@@ -125,10 +125,10 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
                          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
           (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))/2
 
-    return out
+    return out[0][0]
 
 
-@jit(nopython=True)
+#@jit(nopython=True)
 def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
@@ -169,14 +169,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 #        start_time = time.time()
 
     # Setup some constants that will be used throughout the code
-    Rmax = 100
-    Rmin = -1e-6
-    #M = 25 # Set a desired value for M
-
     nt = 1000;
     nx = 32;
 
-    r_extra = 0.674
+    r_extra = 110
     ff = 1e0
 
     gam = 0.01
@@ -201,7 +197,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     i_meas = i_meas.reshape((-1, 1)).astype(np.complex64)
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(np.complex64)
+    A = np.zeros((N, M + 1)).astype(np.float)
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
@@ -214,7 +210,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(np.complex64)
+    A1 = np.zeros((N, M + 1)).astype(np.float)
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j][0] + V0)/dx)+1
@@ -232,11 +228,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(np.complex64)
+    P0 = np.zeros((M+1, M+1)).astype(np.float)
     P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + (Lap @ Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv((A1.T @ A1)/gam/gam + P0).astype(np.complex64)
+    Sigma = np.linalg.inv((A1.T @ A1)/gam/gam + P0).astype(np.float)
     m = (Sigma @ (A1.T @ i_meas)/gam/gam)
 
     # Tuning parameters
@@ -248,7 +244,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     P = np.zeros((M+2, Ns))
 
     # Define prior
-    SS = (spla.sqrtm(Sigma) @ np.random.randn(M+1, Ns).astype(np.complex64)) + np.tile(m, (1, Ns))
+    SS = (spla.sqrtm(Sigma) @ np.random.randn(M+1, Ns).astype(np.float)) + np.tile(m, (1, Ns)).astype(np.float)
     RR = np.concatenate((np.log(1/np.maximum(SS[:M, :], np.full((SS[:M, :]).shape, 
         np.finfo(float).eps))), SS[M, :][np.newaxis]), axis=0)
     mr = 1/Ns*np.sum(RR, axis=1).reshape((-1, 1))
@@ -262,8 +258,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex64)
     S2 = (S @ S.T)
     S1 = np.zeros((M+2, 1)).astype(np.complex64)
-    mm = np.concatenate((mr, np.array([r_extra]))).reshape((-1, 1))
-    ppp = mm.astype(np.complex64)
+    mm = np.concatenate((mr, [[r_extra]])).reshape((-1, 1))
+    ppp = mm.astype(np.float)
     P0 = np.linalg.inv(C0)
 
     # Now we are ready to start the active metropolis
@@ -273,8 +269,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     i = 0
     j = 0
-    Rmax = 1
-    Rmin = 0
+    Rmax = 120
+    Rmin = 100
     Cmax = 10
     Cmin = 0
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
@@ -358,7 +354,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     # Adjusting for capacitance
     dt = 1.0/(f*V.size)
     dvdt = np.diff(V.T[0])/dt
-    dvdt = np.concatenate((dvdt, np.array([dvdt[-1]]))).reshape((-1, 1))
+    dvdt = np.concatenate((dvdt, [[dvdt[-1]]])).reshape((-1, 1))
     point_i_cap = capacitance * dvdt
     point_i_extra = r_extra * 2 * capacitance * V
     i_corrected = i_meas - point_i_cap - point_i_extra

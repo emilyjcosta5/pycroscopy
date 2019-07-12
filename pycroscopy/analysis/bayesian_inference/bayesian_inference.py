@@ -52,7 +52,7 @@ class AdaptiveBayesianInference(Process):
 		# Now do some setting of the variables
 		# Ex. self.frequency_filters = frequency_filters
 		ex_wave = self.h5_main.h5_spec_vals[()]
-		breakpoint()
+		#breakpoint()
 		dt = 1.0/(f*ex_wave.size)
 		dvdt = np.diff(ex_wave)/dt
 		self.dvdt = np.append(dvdt, dvdt[-1])[np.newaxis].T
