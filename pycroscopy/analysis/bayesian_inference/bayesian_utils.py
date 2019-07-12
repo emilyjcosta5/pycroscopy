@@ -112,20 +112,40 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         return R, R_sig, capacitance, i_recon, i_corrected
 
 
+@jit(nopython=True)
+def _logpo_R1_acc(pp, A, V, dV, y, gam, P0, mm):
+    '''
+    ppFloat = pp.astype(np.float64)
+    normArg = V*np.exp(-A[:, :-1] @ ppFloat[:-2]) + pp[-2][0] * (dV + pp[-1][0]*V) - y
+    innerMult = (pp[:-2]-mm[:-2]).T @ P0
+    out = np.linalg.norm(normArg)**2/2/gam/gam + (innerMult @ (pp[:-2]-mm[:-2]))[0][0]/2
+    '''
+    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
+          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
+    #breakpoint()
+    
+
+    return out
+
+
+
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in the while loop of run_bayesian_inference() (and once before to initialize)
-@jit(nopython=True)
+#@jit(nopython=True)
 def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     if pp[-1] > Rmax or pp[-1] < Rmin:
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
         return np.inf
-    
-    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) + \
-                         pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
-          (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))/2
 
-    return out[0][0]
+    '''
+    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
+          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
+
+    return out
+    '''
+    return _logpo_R1_acc(pp, A, V, dV, y, gam, P0, mm)
+
 
 
 #@jit(nopython=True)
@@ -165,8 +185,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
                     the measured current corrected for capacitance
     '''
     # Grab the start time so we can see how long this takes
-#    if(verbose):
-#        start_time = time.time()
+    if(verbose):
+        start_time = time.time()
 
     # Setup some constants that will be used throughout the code
     nt = 1000;
@@ -194,10 +214,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     # max(V) to work properly
     dV = dV.reshape((-1, 1))
     V = V.reshape((-1, 1))
-    i_meas = i_meas.reshape((-1, 1)).astype(np.complex64)
+    i_meas = i_meas.reshape((-1, 1))
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(np.float)
+    A = np.zeros((N, M + 1)).astype(np.float64)
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
@@ -210,7 +230,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(np.float)
+    A1 = np.zeros((N, M + 1)).astype(np.float64)
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j][0] + V0)/dx)+1
@@ -228,11 +248,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(np.float)
+    P0 = np.zeros((M+1, M+1)).astype(np.float64)
     P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + (Lap @ Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv((A1.T @ A1)/gam/gam + P0).astype(np.float)
+    Sigma = np.linalg.inv((A1.T @ A1)/gam/gam + P0).astype(np.float64)
     m = (Sigma @ (A1.T @ i_meas)/gam/gam)
 
     # Tuning parameters
@@ -244,7 +264,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     P = np.zeros((M+2, Ns))
 
     # Define prior
-    SS = (spla.sqrtm(Sigma) @ np.random.randn(M+1, Ns).astype(np.float)) + np.tile(m, (1, Ns)).astype(np.float)
+    SS = (spla.sqrtm(Sigma) @ np.random.randn(M+1, Ns)) + np.tile(m, (1, Ns))
     RR = np.concatenate((np.log(1/np.maximum(SS[:M, :], np.full((SS[:M, :]).shape, 
         np.finfo(float).eps))), SS[M, :][np.newaxis]), axis=0)
     mr = 1/Ns*np.sum(RR, axis=1).reshape((-1, 1))
@@ -255,28 +275,28 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
-        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex64)
+        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1)
     S2 = (S @ S.T)
-    S1 = np.zeros((M+2, 1)).astype(np.complex64)
+    S1 = np.zeros((M+2, 1))
     mm = np.concatenate((mr, [[r_extra]])).reshape((-1, 1))
-    ppp = mm.astype(np.float)
+    ppp = mm.astype(np.float64)
     P0 = np.linalg.inv(C0)
 
     # Now we are ready to start the active metropolis
     if verbose:
         print("Starting active metropolis...")
-#        met_start_time = time.time()
+        met_start_time = time.time()
 
     i = 0
     j = 0
-    Rmax = 120
-    Rmin = 100
-    Cmax = 10
-    Cmin = 0
+    Rmax = 120.0
+    Rmin = 100.0
+    Cmax = 10.0
+    Cmin = 0.0
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
-        pppp = ppp + beta*(S @ np.random.randn(M+2, 1)) # using pp also makes gdb bug out
+        pppp = ppp + beta*(S @ np.random.randn(M+2, 1)).astype(np.float64) # using pp also makes gdb bug out
         logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
@@ -310,7 +330,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
         # proposal covariance adaptation
         if (i+1) % Mint == 0:
             if (j+1) == Mint:
-                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1).reshape((-1, 1)).astype(np.complex64) / j
+                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1).reshape((-1, 1)) / j
             else:
                 S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1).reshape((-1, 1)) / j
 
@@ -331,7 +351,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
 
     if verbose:
         print("Finished Adaptive Metropolis!")
-#        print("Adaptive Metropolis took", time.time() - met_start_time,"\nTotal time taken so far is", time.time() - start_time)
+        print("Adaptive Metropolis took", time.time() - met_start_time,"\nTotal time taken so far is", time.time() - start_time)
 
     # m is a column vector, and the last element is the capacitance exponentiated
     #capacitance = math.log(m[-1][0])
@@ -341,10 +361,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     # Mean and variance of resistance
     meanr = (np.exp(P[:M, int(Ns/2):Ns]) @ np.ones((int(Ns/2), 1))) / (Ns/2)
     mom2r = (np.exp(P[:M, int(Ns/2):Ns]) @ np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
-    varr = mom2r - (meanr @ meanr.T).astype(np.complex64)
+    varr = mom2r - (meanr @ meanr.T)
 
-    R = meanr.astype(np.float)
-    R_sig = np.sqrt(np.diag(varr[:M, :M])).reshape((-1, 1)).astype(np.float)
+    R = meanr.astype(np.float64)
+    R_sig = np.sqrt(np.diag(varr[:M, :M])).reshape((-1, 1)).astype(np.float64)
 
     # Reconstruction of the current
     i_recon = V * (np.exp(-A[:, :M] @ P[:M, int(Ns/2):Ns]) @ np.ones((int(Ns/2), 1))) / (Ns/2) + \
@@ -354,7 +374,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f=200, V0=6, Ns=int(1e7), verbo
     # Adjusting for capacitance
     dt = 1.0/(f*V.size)
     dvdt = np.diff(V.T[0])/dt
-    dvdt = np.concatenate((dvdt, [[dvdt[-1]]])).reshape((-1, 1))
+    dvdt = np.append(dvdt, dvdt[-1]).reshape((-1, 1))
     point_i_cap = capacitance * dvdt
     point_i_extra = r_extra * 2 * capacitance * V
     i_corrected = i_meas - point_i_cap - point_i_extra
@@ -383,7 +403,7 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     plt.subplot(122)
     plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
     plt.plot(V, i_recon, "gx-", label="i_recon")
-    plt.plot(V, i_corrected, "bo", label="i_corrected")
+    #plt.plot(V, i_corrected, "bo", label="i_corrected")
     plt.legend()
 
     return result
