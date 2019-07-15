@@ -25,7 +25,7 @@ import scipy.linalg as spla
 import pycroscopy as px 
 import pyUSID as usid
 
-from bayesian_utils_small import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, 	get_M_dx_x
+from bayesian_utils_small import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, get_M_dx_x, publicGetGraph
 
 
 class AdaptiveBayesianInference(Process):
@@ -87,7 +87,6 @@ class AdaptiveBayesianInference(Process):
 		self.capacitance = None
 		self.i_recon = None
 		self.i_corrected = None
-		self.shifted_i_meas = None
 	
 		# These are the actual databases
 		self.h5_R = None
@@ -95,7 +94,7 @@ class AdaptiveBayesianInference(Process):
 		self.h5_capacitance = None
 		self.h5_i_recon = None
 		self.h5_i_corrected = None
-		if self.verbose: ("empty results set up")
+		if self.verbose: print("empty results set up")
 
 		# Make full_V and num_pixels attributes
 		self.params_dict = dict()
@@ -111,7 +110,10 @@ class AdaptiveBayesianInference(Process):
 		self.params_dict["dx"] = self.dx
 		self.params_dict["x"] = self.x
 		self.params_dict["parse_mod"] = self.parse_mod
-		if self.verbose: ("attributes set up")
+		if self.verbose: print("attributes set up")
+
+		#print("Ran init. self.params_dict is {}".format(self.params_dict))
+
 	def test(self, pix_ind=None):
 		"""
 		Tests the Bayesian inference on a single pixel (randomly chosen unless manually specified) worth of data.
@@ -135,6 +137,22 @@ class AdaptiveBayesianInference(Process):
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
 		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, graph=True, verbose=True)
 
+	def plotPixel(self, pix_ind=None):
+		if pix_ind is None:
+			return None
+
+		# Need x, R, R_sig, V, i_meas, i_recon, i_corrected to graph against .h5_spec_vals[()]
+		x = usid.USIDataset(self.h5_results_grp["Resistance"]).h5_spec_vals[()][0]
+		R = self.h5_results_grp["Resistance"][()][pix_ind, :]
+		R_sig = self.h5_results_grp["R_sig"][()][pix_ind, :]
+		V = usid.USIDataset(self.h5_results_grp["Reconstructed_Current"]).h5_spec_vals[()][0]
+		i_meas = self.h5_main[()][pix_ind, ::self.parse_mod]
+		i_recon = self.h5_results_grp["Reconstructed_Current"][()][pix_ind, :]
+		i_corrected = self.h5_results_grp["Corrected_Current"][()][pix_ind, :]
+
+		return publicGetGraph(self.Ns, pix_ind, self.shift_index, self.split_index, x, R, R_sig, V, i_meas, i_recon, i_corrected)
+
+
 	def _create_results_datasets(self):
 		"""
 		Creates all the datasets necessary for holding all parameters + data.
@@ -145,51 +163,51 @@ class AdaptiveBayesianInference(Process):
 		self.params_dict.update({'last_pixel': 0, 'algorithm': 'pycroscopy_AdaptiveBayesianInference'})
 
 		# Write in our full_V and num_pixels as attributes to this new group
-		write_simple_attrs(self.h5_results_grp, self.parms_dict)
+		write_simple_attrs(self.h5_results_grp, self.params_dict)
 
 		assert isinstance(self.h5_results_grp, h5py.Group)
 
 		# If we ended up parsing down the data, create new spectral datasets (i.e. smaller full_V's)
 		# By convention, we convert the full_V back to a sine wave.
 		if self.parse_mod != 1:
-			h5_spec_inds_new, h5_spec_vals_new = write_ind_val_dsets(self.h5_results_grp, self.full_V.shape, is_spectral=True)
+			h5_spec_inds_new, h5_spec_vals_new = write_ind_val_dsets(self.h5_results_grp, Dimension("Bias", "V", self.full_V.size), is_spectral=True)
 			h5_spec_vals_new[()] = get_unshifted_response(self.full_V, self.shift_index)
 		else:
 			h5_spec_inds_new = self.h5_main.h5_spec_inds
 			h5_spec_vals_new = self.h5_main.h5_spec_vals
 
 		# Also make some new spectroscopic datasets for R and R_sig
-		h5_spec_inds_R, h5_spec_vals_R = write_ind_val_dsets(self.h5_results_grp, 2*self.M, is_spectral=True)
-		h5_spec_vals_R[()] = np.concatenate(x, x)
+		h5_spec_inds_R, h5_spec_vals_R = write_ind_val_dsets(self.h5_results_grp, Dimension("Bias", "V", 2*self.M), is_spectral=True, base_name="Spectroscopic_R")
+		h5_spec_vals_R[()] = np.concatenate((self.x, self.x)).T
 
 		# Initialize our datasets
 		# Note by convention, the spectroscopic values are stored as a sine wave
 		# so i_recon and i_corrected are shifted at the end of bayesian_utils.process_pixel
 		# accordingly.
 		self.h5_R = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], 2*self.M), "Resistance", "Resistance",
-									   "GOhms", None, Dimension("Bias", "V", 2*self.M), dtype=np.float,
+									   "GOhms", None, None, dtype=np.float64,
 									   h5_pos_inds=self.h5_main.h5_pos_inds,
 									   h5_pos_vals=self.h5_main.h5_pos_vals,
 									   h5_spec_inds=h5_spec_inds_R,
 									   h5_spec_vals=h5_spec_vals_R)
 
-		assert isinstance(self.h5_R, USIDataset) # Quick sanity check
-		self.h5_R_sig = create_empty_dataset(self.h5_R, np.float, "R_sig")
+		assert isinstance(self.h5_R, usid.USIDataset) # Quick sanity check
+		self.h5_R_sig = create_empty_dataset(self.h5_R, np.float64, "R_sig")
 
 		self.h5_capacitance = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], 2), "Capacitance", "Capacitance",
 												 "pF", None, Dimension("Direction", "", 2),
 												 h5_pos_inds=self.h5_main.h5_pos_inds,
 												 h5_pos_vals=self.h5_main.h5_pos_vals,
-												 dtype=np.float, aux_spec_prefix="Cap_Spec_")
+												 dtype=np.float64, aux_spec_prefix="Cap_Spec_")
 
 		# Not sure what units this should be so tentatively storing it as amps
 		self.h5_i_recon = write_main_dataset(self.h5_results_grp, (self.h5_main.shape[0], self.full_V.size), "Reconstructed_Current", "Current",
-											 "A", None, Dimension("Bias", "V", self.full_V.size), dtype=np.float,
+											 "nA", None, None, dtype=np.float64,
 											 h5_pos_inds=self.h5_main.h5_pos_inds,
 											 h5_pos_vals=self.h5_main.h5_pos_vals,
 											 h5_spec_inds=h5_spec_inds_new,
 											 h5_spec_vals=h5_spec_vals_new)
-		self.h5_i_corrected = create_empty_dataset(self.h5_i_recon, np.float, "Corrected_Current")
+		self.h5_i_corrected = create_empty_dataset(self.h5_i_recon, np.float64, "Corrected_Current")
 
 		'''
 		# Initialize our datasets
@@ -216,12 +234,13 @@ class AdaptiveBayesianInference(Process):
 		self.h5_i_recon = self.h5_results_grp["i_recon"]
 		self.h5_i_corrected = self.h5_results_grp["i_corrected"]
 
-	def _write_results_chunk(self):
+	def _write_results_chunk(self, pos_in_batch=None):
 		"""
 		Writes data chunks back to the file
 		"""
 		# Get access to the private variable:
-		pos_in_batch = self._get_pixels_in_current_batch()
+		if pos_in_batch is None:
+			pos_in_batch = self._get_pixels_in_current_batch()
 
 		# Ex. if self.write_filtered:
 		#    self.h5_filtered[pos_in_batch, :] = self.filtered_data
@@ -233,7 +252,7 @@ class AdaptiveBayesianInference(Process):
 		if self.verbose: print("results written back to file")
 		# Process class handles checkpointing.
 
-	def _unit_computation(self, *args, **kwargs):
+	def _unit_computation(self, pos_in_batch=None, *args, **kwargs):
 		"""
 		Processing per chunk of the dataset
 		Parameters
@@ -243,26 +262,29 @@ class AdaptiveBayesianInference(Process):
 		kwargs : dictionary
 			Not used
 		"""
+
+		if pos_in_batch is not None:
+			self.data = self.h5_main[()][pos_in_batch, :]
+
 		# This is where you add the Matlab code you translated. You can add stuff to other Python files in processing, 
 		#like gmode_utils or comp_utils, depending on what your function does. Just add core code here.
-		self.shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
-		all_data = parallel_compute(self.shifted_i_meas, process_pixel, cores=self._cores,
+		shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
+
+		#print("Shifted_i_meas is {}".format(shifted_i_meas))
+
+		all_data = parallel_compute(np.array(shifted_i_meas), process_pixel, cores=self._cores,
 									func_args=[self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt])
 
 		# Since process_pixel returns a tuple, parse the list of tuples into individual lists
 		# Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
 		# and R, R_sig, i_recon, and i_corrected are column vectors, which are funky to work with
-		self.R = np.array([result[0].T[0] for result in all_data]).astype(np.float)
-		self.R_sig = np.array([result[1].T[0] for result in all_data]).astype(np.float)
-		self.capacitance = np.array([result[2] for result in all_data])
-		self.i_recon = np.array([result[3].T[0] for result in all_data]).astype(np.float)
-		self.i_corrected = np.array([result[4].T[0] for result in all_data]).astype(np.float)
+		self.R = np.array([result[0].T[0] for result in all_data]).astype(np.float64)
+		self.R_sig = np.array([result[1].T[0] for result in all_data]).astype(np.float64)
+		self.capacitance = np.array([result[2] for result in all_data]).astype(np.float64)
+		self.i_recon = np.array([result[3].T[0] for result in all_data]).astype(np.float64)
+		self.i_corrected = np.array([result[4].T[0] for result in all_data]).astype(np.float64)
+		#print("capacitances are {} with shape {}".format(self.capacitance, self.capacitance.shape))
 		if self.verbose: print("chunk computed")
-
-
-
-
-
 
 
 

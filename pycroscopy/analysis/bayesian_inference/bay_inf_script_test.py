@@ -20,6 +20,9 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     figFor, figRev = abi.test(pix_ind=27935)
 
+    figFor.set_size_inches(25, 10)
+    figRev.set_size_inches(25, 10)
+
     figFor.savefig("27935forward1e8.png")
     figRev.savefig("27935reverse1e8.png")
 

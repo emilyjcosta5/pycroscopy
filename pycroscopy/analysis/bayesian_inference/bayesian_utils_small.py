@@ -16,6 +16,9 @@ import h5py
 import pycroscopy as px 
 import pyUSID as usid 
 
+# Library to speed up adaptive metropolis
+from numba import jit 
+
 # Takes in the sine full_V wave and finds the index used to shift the waveform into
 # a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
 # index used to split the waveform into forward and reverse sections). It returns
@@ -111,6 +114,12 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         i_corrected = get_unshifted_response(i_corrected, shift_index)
         return R, R_sig, capacitance, i_recon, i_corrected
 
+# Helper function because Numba crashes when it isn't supposed to
+@jit(nopython=True)
+def _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm):
+    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
+          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
+    return out
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in the while loop of run_bayesian_inference() (and once before to initialize)
@@ -119,12 +128,12 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
         return np.inf
-    
+    '''
     out = np.linalg.norm(V*np.exp(np.matmul(-A[:, :-1], pp[:-2])) + \
                          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
           np.matmul(np.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
-
-    return out
+    '''
+    return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
 
 
 def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False):
@@ -195,7 +204,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(np.complex)
+    A = np.zeros((N, M + 1))
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
@@ -208,7 +217,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(np.complex)
+    A1 = np.zeros((N, M + 1))
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
@@ -226,11 +235,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(np.complex)
+    P0 = np.zeros((M+1, M+1))
     P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + np.matmul(Lap, Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(np.complex)
+    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0)
     m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
 
     # Tuning parameters
@@ -256,12 +265,21 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = np.concatenate((np.concatenate((SR, np.zeros((2, M))), axis=0), 
-        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1).astype(np.complex)
+        np.concatenate((np.zeros((M, 2)), amp*np.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1)
     S2 = np.matmul(S, S.T)
-    S1 = np.zeros((M+2, 1)).astype(np.complex)
+    S1 = np.zeros((M+2, 1))
     mm = np.append(mr, r_extra)[np.newaxis].T
-    ppp = mm.astype(np.complex)
-    P0 = np.linalg.inv(C0)
+    ppp = mm.astype(np.float64)
+
+    # for some reason, this may throw a np.linalg.LinAlgError: Singular Matrix
+    # when trying to process the 0th pixel. After exiting this try catch block,
+    # the concatinations in process pixel fails.
+    try:
+        P0 = np.linalg.inv(C0)
+    except np.linalg.LinAlgError:
+        print("P0 failed to instantiate.")
+        return None, None, None, None, None
+    
 
     # Now we are ready to start the active metropolis
     if verbose:
@@ -277,7 +295,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
-        pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)) # using pp also makes gdb bug out
+        pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)).astype(np.float64) # using pp also makes gdb bug out
         logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
@@ -317,7 +335,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             iMintEnd = (i+1)%num_samples
 
             if (j+1) == Mint:
-                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T.astype(np.complex) / j
+                S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T / j
             else:
                 S1lag = (j - Mint)/j*S1lag + np.sum(P[:, jMintStart:jMintEnd] * P[:, jMintStart+1:jMintEnd+1], axis=1)[np.newaxis].T / j
 
@@ -347,7 +365,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     # Mean and variance of resistance
     meanr = np.matmul(np.exp(P[:M,:]), np.ones((num_samples, 1))) / num_samples
     mom2r = np.matmul(np.exp(P[:M,:]), np.exp(P[:M,:]).T) / num_samples
-    varr = mom2r - np.matmul(meanr, meanr.T).astype(np.complex)
+    varr = mom2r - np.matmul(meanr, meanr.T)
 
     R = meanr.astype(np.float)
     R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
@@ -391,6 +409,54 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
     plt.plot(V, i_recon, "gx-", label="i_recon")
     plt.plot(V, i_corrected, "bo", label="i_corrected")
+    plt.legend()
+
+    return result
+
+
+def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas, i_recon, i_corrected):
+    #return _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected)
+    rLenHalf = R_sig.size//2
+
+    shiftV = get_shifted_response(V, shift_index)
+    i_corrected = get_shifted_response(i_corrected, shift_index)
+
+    # Clean up R and R_sig for unsuccessfully predicted resistances
+    for i in range(rLenHalf*2):
+        if np.isnan(R_sig[i]) or R_sig[i] > 100:
+            R_sig[i] = np.nan
+            R[i] = np.nan
+
+    #breakpoint()
+
+    # Create the figure to be returned
+    result = plt.figure()
+
+    plt.suptitle("Pixel {} after {} iterations".format(pix_ind, Ns))
+
+    # Plot the forward resistance estimation on the left subplot
+    plt.subplot(131)
+    plt.title("Forward resistance")
+    plt.plot(x[:rLenHalf], R[:rLenHalf], "gx-", label="ER")
+    plt.plot(x[:rLenHalf], R[:rLenHalf]+R_sig[:rLenHalf], "rx:", label="ER+\u03C3_R")
+    plt.plot(x[:rLenHalf], R[:rLenHalf]-R_sig[:rLenHalf], "rx:", label="ER-\u03C3_R")
+    plt.legend()
+
+    # Plot the reverse resistance estimation on the middle subplot
+    plt.subplot(132)
+    plt.title("Reverse resistance")
+    plt.plot(x[rLenHalf:], R[rLenHalf:], "gx-", label="ER")
+    plt.plot(x[rLenHalf:], R[rLenHalf:]+R_sig[rLenHalf:], "rx:", label="ER+\u03C3_R")
+    plt.plot(x[rLenHalf:], R[rLenHalf:]-R_sig[rLenHalf:], "rx:", label="ER-\u03C3_R")
+    plt.legend()
+
+    # Plot the current data on the right subplot
+    plt.subplot(133)
+    plt.title("Current")
+    plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
+    plt.plot(V, i_recon, "gx-", label="i_recon")
+    plt.plot(shiftV[:split_index], i_corrected[:split_index], "bx", label="forward i_corrected")
+    plt.plot(shiftV[split_index:], i_corrected[split_index:], "yx", label="reverse i_corrected")
     plt.legend()
 
     return result
