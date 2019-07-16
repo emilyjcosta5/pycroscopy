@@ -1,4 +1,5 @@
 import h5py
+import os
 import matplotlib.pyplot as plt
 #from mpi4py import MPI
 from bayesian_inference import AdaptiveBayesianInference
@@ -11,7 +12,9 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     h5_resh = h5_grp['Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000/Reshaped_Data']
 
-    abi = AdaptiveBayesianInference(h5_resh, verbose=True)
+    abi = AdaptiveBayesianInference(h5_resh, Ns=int(10), verbose=True)
 
     fig1, fig2 = abi.test()
-    plt.savefig('result0.png', 'result1.png')
+    #plt.savefig("result0.png")
+    #plt.savefig("result1.png")
+

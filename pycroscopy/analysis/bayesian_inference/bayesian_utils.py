@@ -7,7 +7,9 @@ Created on Tue Jul 02 2019
 import os
 import time
 import math
-import numpy as np
+import cupy as np
+import numpy
+#import cupy as cp
 import scipy.linalg as spla
 from matplotlib import pyplot as plt
 
@@ -117,8 +119,10 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in the while loop of run_bayesian_inference() (and once before to initialize)
+#@cuda.jit
 @jit(nopython=True)
 def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
+ 
     if pp[-1] > Rmax or pp[-1] < Rmin:
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
@@ -264,7 +268,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     S1 = np.zeros((M+2, 1))
     mm = np.append(mr, r_extra)[np.newaxis].T
     ppp = mm.astype(np.float64)
-    P0 = np.linalg.inv(C0)
+    P0 = numpy.linalg.inv(C0)
 
     # Now we are ready to start the active metropolis
     if verbose:
@@ -277,11 +281,19 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     Rmin = 100
     Cmax = 10
     Cmin = 0
+    #threadsperblock = 32
+    #blockspergrid = (ppp.size + (threadsperblock - 1)) 
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
-
+    #logpold = _logpo_R1[blockspergrid, threadsperblock](ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
+    print("logp size")
+    print(logpold.size)
+    print("ppp size")
+    print(ppp.size)
     while i < Ns:
         pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)).astype(np.float64) # using pp also makes gdb bug out
+        
         logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
+        #logpnew = _logpo_R1[blockspergrid, threadsperblock](pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
         # Note: unlike Matlab's rand, which is a uniformly distributed selection from (0, 1),
