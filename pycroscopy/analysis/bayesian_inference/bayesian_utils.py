@@ -413,3 +413,6 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
 
     return result
 
+
+def publicGetGraph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
+    return _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected)
