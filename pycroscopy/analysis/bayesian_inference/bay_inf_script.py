@@ -1,6 +1,10 @@
 import h5py
 from mpi4py import MPI
 from .bayesian_inference import AdaptiveBayesianInference
+import time
+
+
+startTime = time.time()
 
 h5_path = 'pzt_nanocap_6_split_bayesian_compensation_R_correction.h5'
 
@@ -12,4 +16,6 @@ with h5py.File(h5_path, mode='r+', driver='mpio', comm=MPI.COMM_WORLD) as h5_f:
 
     abi = AdaptiveBayesianInference(h5_resh)
 
-    h5_bayes_grp = abi.compute()
+    h5_bayes_group = abi.compute()
+
+print(time.time() - startTime)
