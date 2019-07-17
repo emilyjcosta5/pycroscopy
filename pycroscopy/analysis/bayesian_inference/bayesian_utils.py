@@ -7,9 +7,7 @@ Created on Tue Jul 02 2019
 import os
 import time
 import math
-import cupy as np
-import numpy
-#import cupy as cp
+import numpy as np
 import scipy.linalg as spla
 from matplotlib import pyplot as plt
 
@@ -19,7 +17,7 @@ import pycroscopy as px
 import pyUSID as usid 
 
 # Library to speed up adaptive metropolis
-from numba import jit
+from numba import jit 
 
 # Takes in the sine full_V wave and finds the index used to shift the waveform into
 # a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
@@ -116,13 +114,16 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         i_corrected = get_unshifted_response(i_corrected, shift_index)
         return R, R_sig, capacitance, i_recon, i_corrected
 
+# Helper function because Numba crashes when it isn't supposed to
+@jit(nopython=True)
+def _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm):
+    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
+          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
+    return out
 
 # Does math stuff and returns a number relevant to some probability distribution.
 # Used only in the while loop of run_bayesian_inference() (and once before to initialize)
-#@cuda.jit
-@jit(nopython=True)
 def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
- 
     if pp[-1] > Rmax or pp[-1] < Rmin:
         return np.inf
     if pp[-2] > Cmax or pp[-2] < Cmin:
@@ -132,9 +133,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
                          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + \
           np.matmul(np.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
     '''
-    out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
-          pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
-    return out
+    return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
 
 
 def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False):
@@ -205,7 +204,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
-    A = np.zeros((N, M + 1)).astype(np.float64)
+    A = np.zeros((N, M + 1))
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
@@ -218,7 +217,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    A1 = np.zeros((N, M + 1)).astype(np.float64)
+    A1 = np.zeros((N, M + 1))
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
@@ -236,11 +235,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     Lap[0, 0] = 1/dx/dx
     Lap[-1, -1] = 1/dx/dx
 
-    P0 = np.zeros((M+1, M+1)).astype(np.float64)
+    P0 = np.zeros((M+1, M+1))
     P0[:M, :M] = (1/sigma/sigma)*(np.eye(M) + np.matmul(Lap, Lap))
     P0[M, M] = 1/sigc/sigc
 
-    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0).astype(np.float64)
+    Sigma = np.linalg.inv(np.matmul(A1.T, A1)/gam/gam + P0)
     m = np.matmul(Sigma, np.matmul(A1.T, i_meas)/gam/gam)
 
     # Tuning parameters
@@ -249,14 +248,17 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     r = 1.1
     beta = 1
     nacc = 0
-    P = np.zeros((M+2, Ns))
+    #P = np.zeros((M+2, Ns))
+    # Only store a million samples to save space
+    num_samples = min(Ns, int(1e6))
+    P = np.zeros((M+2, num_samples))
 
     # Define prior
-    SS = np.matmul(spla.sqrtm(Sigma), np.random.randn(M+1, Ns)) + np.tile(m, (1, Ns))
+    SS = np.matmul(spla.sqrtm(Sigma), np.random.randn(M+1, num_samples)) + np.tile(m, (1, num_samples))
     RR = np.concatenate((np.log(1/np.maximum(SS[:M, :], np.full((SS[:M, :]).shape, 
         np.finfo(float).eps))), SS[M, :][np.newaxis]), axis=0)
-    mr = 1/Ns*np.sum(RR, axis=1)[np.newaxis].T
-    SP = 1/Ns*np.matmul(RR - np.tile(mr, (1, Ns)), (RR - np.tile(mr, (1, Ns))).T)
+    mr = 1/num_samples*np.sum(RR, axis=1)[np.newaxis].T
+    SP = 1/num_samples*np.matmul(RR - np.tile(mr, (1, num_samples)), (RR - np.tile(mr, (1, num_samples))).T)
     amp = 100
     C0 = amp**2 * SP[:M, :M]
     SR = spla.sqrtm(C0)
@@ -268,7 +270,17 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     S1 = np.zeros((M+2, 1))
     mm = np.append(mr, r_extra)[np.newaxis].T
     ppp = mm.astype(np.float64)
-    P0 = numpy.linalg.inv(C0)
+
+    # for some reason, this may throw a np.linalg.LinAlgError: Singular Matrix
+    # when trying to process the 0th pixel. After exiting this try catch block,
+    # the concatinations in process pixel fails.
+    try:
+        P0 = np.linalg.inv(C0)
+    except np.linalg.LinAlgError:
+        print("P0 failed to instantiate.")
+        # return zero versions of R, R_sig, capacitance, i_recon, i_corrected
+        return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
+    
 
     # Now we are ready to start the active metropolis
     if verbose:
@@ -281,19 +293,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     Rmin = 100
     Cmax = 10
     Cmin = 0
-    #threadsperblock = 32
-    #blockspergrid = (ppp.size + (threadsperblock - 1)) 
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
-    #logpold = _logpo_R1[blockspergrid, threadsperblock](ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
-    print("logp size")
-    print(logpold.size)
-    print("ppp size")
-    print(ppp.size)
+
     while i < Ns:
         pppp = ppp + beta*np.matmul(S, np.random.randn(M+2, 1)).astype(np.float64) # using pp also makes gdb bug out
-        
         logpnew = _logpo_R1(pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
-        #logpnew = _logpo_R1[blockspergrid, threadsperblock](pppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
         
         # accept or reject
         # Note: unlike Matlab's rand, which is a uniformly distributed selection from (0, 1),
@@ -320,20 +324,26 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
             nacc = 0
 
-        # Save all samples because why not (this is not necessary and can get large)
-        P[:, i] = ppp.T[0]
+        # Save only the last num_samples samples to save space
+        P[:, i%num_samples] = ppp.T[0]
 
         # proposal covariance adaptation
         if (i+1) % Mint == 0:
+            # Get index values to fit into the smaller matrix
+            jMintStart = (j-Mint)%num_samples
+            jMintEnd = j%num_samples
+            iMintStart = (i-Mint+1)%num_samples
+            iMintEnd = (i+1)%num_samples
+
             if (j+1) == Mint:
                 S1lag = np.sum(P[:, :j] * P[:, 1:j+1], axis=1)[np.newaxis].T / j
             else:
-                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, j-Mint:j] * P[:, j-Mint+1:j+1], axis=1)[np.newaxis].T / j
+                S1lag = (j - Mint)/j*S1lag + np.sum(P[:, jMintStart:jMintEnd] * P[:, jMintStart+1:jMintEnd+1], axis=1)[np.newaxis].T / j
 
             # Update meani based on Mint batch
-            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, i-Mint+1:i+1], axis=1)[np.newaxis].T/(j+1)
+            S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, iMintStart:iMintEnd], axis=1)[np.newaxis].T/(j+1)
             # Update Sigma based on Mint batch
-            S2 = (j+1-Mint)/(j+1)*S2 + np.matmul(P[:, i-Mint+1:i+1], P[:, i-Mint+1:i+1].T)/(j+1)
+            S2 = (j+1-Mint)/(j+1)*S2 + np.matmul(P[:, iMintStart:iMintEnd], P[:, iMintStart:iMintEnd].T)/(j+1)
             #print("P's shape is {}".format(P.shape))
             # Approximate L such that L*L' = Sigma, where the second term is a
             # decaying regularization
@@ -352,20 +362,19 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     #capacitance = math.log(m[-1][0])
     capacitance = pppp[-2][0]
     r_extra = pppp[-1][0]
-    print("inferred r_extra is {}".format(pppp[-1][0]))
 
     # Mean and variance of resistance
-    meanr = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.ones((int(Ns/2), 1))) / (Ns/2)
-    mom2r = np.matmul(np.exp(P[:M, int(Ns/2):Ns]), np.exp(P[:M, int(Ns/2):Ns]).T) / (Ns/2)
+    meanr = np.matmul(np.exp(P[:M,:]), np.ones((num_samples, 1))) / num_samples
+    mom2r = np.matmul(np.exp(P[:M,:]), np.exp(P[:M,:]).T) / num_samples
     varr = mom2r - np.matmul(meanr, meanr.T)
 
-    R = meanr.astype(np.float64)
-    R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float64)
+    R = meanr.astype(np.float)
+    R_sig = np.sqrt(np.diag(varr[:M, :M]))[np.newaxis].T.astype(np.float)
 
     # Reconstruction of the current
-    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, int(Ns/2):Ns])), np.ones((int(Ns/2), 1))) / (Ns/2) + \
-            np.matmul(np.tile(P[M, int(Ns/2):Ns], (N, 1))*(np.tile(dV, (1, int(Ns/2))) + P[M+1, int(Ns/2):Ns]*np.tile(V, (1, int(Ns/2)))), \
-                      np.ones((int(Ns/2), 1))) / (Ns/2)
+    i_recon = V * np.matmul(np.exp(np.matmul(-A[:, :M], P[:M, :])), np.ones((num_samples, 1))) / (num_samples) + \
+            np.matmul(np.tile(P[M,:], (N, 1))*(np.tile(dV, (1, num_samples)) + P[M+1, :]*np.tile(V, (1, num_samples))), \
+                      np.ones((num_samples, 1))) / num_samples
 
     # Adjusting for capacitance
     point_i_cap = capacitance * dvdt
@@ -380,17 +389,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(R_sig.size):
-        if np.isnan(R_sig[i]) or R_sig[i] > 1000:
+        if np.isnan(R_sig[i]) or R_sig[i] > 100:
             R_sig[i] = np.nan
             R[i] = np.nan
 
     #breakpoint()
-
-    '''
-    resh_point = np.loadtxt("resh_point.txt")
-    point_i_corr = np.loadtxt("point_i_corr.txt")
-    single_AO = np.loadtxt("single_AO.txt")
-    '''
 
     # Create the figure to be returned
     result = plt.figure()
@@ -405,14 +408,57 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Plot the current data on the right subplot
     plt.subplot(122)
     plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
-    plt.plot(V, i_recon, "gx", label="i_recon")
+    plt.plot(V, i_recon, "gx-", label="i_recon")
     plt.plot(V, i_corrected, "bo", label="i_corrected")
-    #plt.plot(single_AO, resh_point, "k--", label="old_resh_point")
-    #plt.plot(single_AO, point_i_corr, "k:", label="old_i_corrected")
     plt.legend()
 
     return result
 
 
-def publicGetGraph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
-    return _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected)
+def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas, i_recon, i_corrected):
+    #return _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected)
+    rLenHalf = R_sig.size//2
+
+    shiftV = get_shifted_response(V, shift_index)
+    i_corrected = get_shifted_response(i_corrected, shift_index)
+
+    # Clean up R and R_sig for unsuccessfully predicted resistances
+    for i in range(rLenHalf*2):
+        if np.isnan(R_sig[i]) or R_sig[i] > 100:
+            R_sig[i] = np.nan
+            R[i] = np.nan
+
+    #breakpoint()
+
+    # Create the figure to be returned
+    result = plt.figure()
+
+    plt.suptitle("Pixel {} after {} iterations".format(pix_ind, Ns))
+
+    # Plot the forward resistance estimation on the left subplot
+    plt.subplot(131)
+    plt.title("Forward resistance")
+    plt.plot(x[:rLenHalf], R[:rLenHalf], "gx-", label="ER")
+    plt.plot(x[:rLenHalf], R[:rLenHalf]+R_sig[:rLenHalf], "rx:", label="ER+\u03C3_R")
+    plt.plot(x[:rLenHalf], R[:rLenHalf]-R_sig[:rLenHalf], "rx:", label="ER-\u03C3_R")
+    plt.legend()
+
+    # Plot the reverse resistance estimation on the middle subplot
+    plt.subplot(132)
+    plt.title("Reverse resistance")
+    plt.plot(x[rLenHalf:], R[rLenHalf:], "gx-", label="ER")
+    plt.plot(x[rLenHalf:], R[rLenHalf:]+R_sig[rLenHalf:], "rx:", label="ER+\u03C3_R")
+    plt.plot(x[rLenHalf:], R[rLenHalf:]-R_sig[rLenHalf:], "rx:", label="ER-\u03C3_R")
+    plt.legend()
+
+    # Plot the current data on the right subplot
+    plt.subplot(133)
+    plt.title("Current")
+    plt.plot(V, i_meas, "ro", mfc="none", label="i_meas")
+    plt.plot(V, i_recon, "gx-", label="i_recon")
+    plt.plot(shiftV[:split_index], i_corrected[:split_index], "bx", label="forward i_corrected")
+    plt.plot(shiftV[split_index:], i_corrected[split_index:], "yx", label="reverse i_corrected")
+    plt.legend()
+
+    return result
+
