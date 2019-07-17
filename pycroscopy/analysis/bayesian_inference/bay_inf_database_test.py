@@ -16,9 +16,12 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     h5_resh = h5_f['Measurement_000/Channel_000/Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000/Reshaped_Data']
 
-    abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=int(1e7))
+    Ns = int(1e8)
+    M = 125
 
-    pos_in_batch = [7, 11, 27935]
+    abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=Ns, M=M)
+
+    pos_in_batch = [138, 3994, 27935]
 
     # lol bad coding practices for the win
     abi._create_results_datasets()
@@ -30,6 +33,8 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     figs = [None, None, None]
     for i in range(len(pos_in_batch)):
         figs[i] = abi.plotPixel(pos_in_batch[i])
+        figs[i].set_size_inches(40, 10)
+        figs[i].savefig("Pixel{}_Ns{}_M{}.png".format(pos_in_batch[i], Ns, M))
         figs[i].show()
 
     input("Pause here to inspect graphs... Press <Enter> to exit program.")

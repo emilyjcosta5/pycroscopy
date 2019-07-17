@@ -29,7 +29,7 @@ from bayesian_utils_small import get_shift_and_split_indices, process_pixel, get
 
 
 class AdaptiveBayesianInference(Process):
-	def __init__(self, h5_main, f=200, V0=None, Ns=int(1e7), **kwargs):
+	def __init__(self, h5_main, f=200, V0=None, Ns=int(1e7), M=125, parse_mod=1, **kwargs):
 		"""
 		Bayesian inference is done on h5py dataset object that has already been filtered
 		and reshaped.
@@ -47,7 +47,7 @@ class AdaptiveBayesianInference(Process):
 		# This determines how to parse down the data (i.e. used_data = actual_data[::parse_mod]).
 		# If parse_mod == 1, then we use the entire dataset. We may be able to input this as an
 		# argument, but for now this is just to improve maintainability.
-		self.parse_mod = 4
+		self.parse_mod = parse_mod
 		if self.verbose: print("parsed data")
 		# Now do some setting of the variables
 		# Ex. self.frequency_filters = frequency_filters
@@ -76,7 +76,7 @@ class AdaptiveBayesianInference(Process):
 		self.dvdt = get_shifted_response(self.dvdt, self.shift_index)
 		if V0 is None:
 			V0 = max(self.full_V)
-		self.M, self.dx, self.x = get_M_dx_x(V0=V0, M=25)
+		self.M, self.dx, self.x = get_M_dx_x(V0=V0, M=M)
 		self.V0 = V0
 		self.f = f
 		self.Ns = Ns
