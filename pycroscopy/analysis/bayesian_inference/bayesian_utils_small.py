@@ -278,7 +278,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         P0 = np.linalg.inv(C0)
     except np.linalg.LinAlgError:
         print("P0 failed to instantiate.")
-        return None, None, None, None, None
+        # return zero versions of R, R_sig, capacitance, i_recon, i_corrected
+        return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
     
 
     # Now we are ready to start the active metropolis
