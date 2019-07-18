@@ -91,9 +91,10 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, dvdtFor, verbose=verbose)
     reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, dvdtRev, verbose=verbose)
 
+    '''
     # If we want a graph, we graph our data and return the figure
     #if(graph):
-        '''
+        
         R, R_sig, capacitance, i_recon, i_corrected = forward_results
         forward_graph = _get_simple_graph(x, R, R_sig, Vfor, Ifor, i_recon, i_corrected)
 
@@ -101,9 +102,9 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         reverse_graph = _get_simple_graph(x, R, R_sig, Vrev, Irev, i_recon, i_corrected)
 
         return forward_graph, reverse_graph
-        '''
+        
 
-    #else:
+    else:'''
     # Concatenate the forward and reverse results together and return in a tuple
     # for easier parallel processing
     # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
@@ -120,6 +121,7 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         # calls publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas, i_recon, i_corrected)
         full_V = get_unshifted_response(full_V, shift_index)
         full_i_meas = get_unshifted_response(full_i_meas, shift_index)
+        x = np.concatenate((x, x))
         return publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, full_V, full_i_meas, i_recon, i_corrected)
     else:
         return R, R_sig, capacitance, i_recon, i_corrected
