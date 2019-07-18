@@ -65,7 +65,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, dvdt, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, dvdt, pix_ind=0, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -92,7 +92,8 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, dvdtRev, verbose=verbose)
 
     # If we want a graph, we graph our data and return the figure
-    if(graph):
+    #if(graph):
+        '''
         R, R_sig, capacitance, i_recon, i_corrected = forward_results
         forward_graph = _get_simple_graph(x, R, R_sig, Vfor, Ifor, i_recon, i_corrected)
 
@@ -100,18 +101,27 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         reverse_graph = _get_simple_graph(x, R, R_sig, Vrev, Irev, i_recon, i_corrected)
 
         return forward_graph, reverse_graph
+        '''
+
+    #else:
+    # Concatenate the forward and reverse results together and return in a tuple
+    # for easier parallel processing
+    # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
+    R = np.concatenate((forward_results[0], reverse_results[0]), axis=0)
+    R_sig = np.concatenate((forward_results[1], reverse_results[1]), axis=0)
+    capacitance = np.array([forward_results[2], reverse_results[2]])
+    i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
+    i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
+    # Shift i_recon and i_corrected back to correspond to a sine excitation wave
+    i_recon = get_unshifted_response(i_recon, shift_index)
+    i_corrected = get_unshifted_response(i_corrected, shift_index)
+
+    if(graph):
+        # calls publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas, i_recon, i_corrected)
+        full_V = get_unshifted_response(full_V, shift_index)
+        full_i_meas = get_unshifted_response(full_i_meas, shift_index)
+        return publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, full_V, full_i_meas, i_recon, i_corrected)
     else:
-        # Concatenate the forward and reverse results together and return in a tuple
-        # for easier parallel processing
-        # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
-        R = np.concatenate((forward_results[0], reverse_results[0]), axis=0)
-        R_sig = np.concatenate((forward_results[1], reverse_results[1]), axis=0)
-        capacitance = np.array([forward_results[2], reverse_results[2]])
-        i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
-        i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
-        # Shift i_recon and i_corrected back to correspond to a sine excitation wave
-        i_recon = get_unshifted_response(i_recon, shift_index)
-        i_corrected = get_unshifted_response(i_corrected, shift_index)
         return R, R_sig, capacitance, i_recon, i_corrected
 
 # Helper function because Numba crashes when it isn't supposed to

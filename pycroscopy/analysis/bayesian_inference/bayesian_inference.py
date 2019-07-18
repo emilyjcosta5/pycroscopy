@@ -130,12 +130,12 @@ class AdaptiveBayesianInference(Process):
 		if self.mpi_rank > 0:
 			return
 		if pix_ind is None:
-			pix_ind = np.random.randint(0, high=self.h5_main.shape[0])
+			pix_ind = np.random.randint(1, high=self.h5_main.shape[0])
 
 		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
-		return process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, graph=True, verbose=True)
+		return pix_ind, process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, pix_ind=pix_ind, graph=True, verbose=True)
 
 	def plotPixel(self, pix_ind=None):
 		if pix_ind is None:
