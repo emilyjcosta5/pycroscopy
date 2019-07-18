@@ -1,6 +1,7 @@
 import h5py
 #from mpi4py import MPI
 import io
+import time
 from bayesian_inference import AdaptiveBayesianInference
 from matplotlib import pyplot as plt
 import pyUSID as usid
@@ -16,21 +17,25 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     h5_resh = h5_f['Measurement_000/Channel_000/Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000/Reshaped_Data']
 
-    Ns = int(1e8)
-    M = 125
+    Ns = int(1e7)
+    M = 24
 
     abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=Ns, M=M)
 
-    pos_in_batch = [138, 3994, 27935]
+    pos_in_batch = [0, 138, 3994, 27935]
+
+    start_time = time.time()
 
     # lol bad coding practices for the win
     abi._create_results_datasets()
     abi._unit_computation(pos_in_batch=pos_in_batch)
     abi._write_results_chunk(pos_in_batch=pos_in_batch)
 
+    print("Processing {} pixels with Ns = {} and M = {} took {} seconds".format(len(pos_in_batch), Ns, M, time.time() - start_time))
+
     #usid.hdf_utils.print_tree(h5_f['Measurement_000/Channel_000/Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000'])
 
-    figs = [None, None, None]
+    figs = [None, None, None, None]
     for i in range(len(pos_in_batch)):
         figs[i] = abi.plotPixel(pos_in_batch[i])
         figs[i].set_size_inches(40, 10)
