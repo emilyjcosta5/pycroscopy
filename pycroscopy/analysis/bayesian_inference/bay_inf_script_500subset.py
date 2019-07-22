@@ -20,5 +20,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     subset = abi.h5_main.slice_to_dataset(slice_dict=myDict)
     abi_subset = AdaptiveBayesianInference(subset)
     h5_bayes_group = abi_subset.compute()
-
+    with h5py.File('bayesian_results.h5', 'a') as f:
+        f.create_group("results0")
+        h5py.copy(h5_bayes_group, f, name="h5_bayes_group")
 print(time.time() - startTime)
