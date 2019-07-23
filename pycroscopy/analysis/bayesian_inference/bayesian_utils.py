@@ -8,6 +8,7 @@ import os
 import time
 import math
 import cupy as np
+import numpy
 import scipy.linalg as spla
 from matplotlib import pyplot as plt
 
@@ -60,7 +61,7 @@ def get_unshifted_response(full_i_meas, shift_index):
 # Takes in excitation wave amplitude and desired M value. Returns M, dx, and x.
 def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
-    x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    x = numpy.arange(-V0, V0+dx, dx)[np.newaxis].T
     M = x.size # M may not be the desired value but it will be very close
     return M, dx, x
 
