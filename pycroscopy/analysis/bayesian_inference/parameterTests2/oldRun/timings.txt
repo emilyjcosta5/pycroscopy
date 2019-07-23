@@ -1,0 +1,1 @@
+Ns = 10000000 and M = 25 took 764.2631742954254 seconds on pixel 64550 with traces

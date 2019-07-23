@@ -1,0 +1,17 @@
+Ns = 10000000 and M = 25 took 832.5586111545563 seconds on pixel 27653
+Ns = 10000000 and M = 75 took 1407.7165286540985 seconds on pixel 29464
+Ns = 10000000 and M = 125 took 1764.6300213336945 seconds on pixel 60738
+Ns = 10000000 and M = 175 took 2157.013226032257 seconds on pixel 19739
+Ns = 50000000 and M = 25 took 3948.9977004528046 seconds on pixel 8555
+Ns = 50000000 and M = 75 took 6257.965420007706 seconds on pixel 44066
+Ns = 50000000 and M = 125 took 7807.310558795929 seconds on pixel 27685
+Ns = 50000000 and M = 175 took 9623.326864480972 seconds on pixel 25581
+Ns = 100000000 and M = 25 took 7334.203987598419 seconds on pixel 14592
+Ns = 100000000 and M = 75 took 12351.85651755333 seconds on pixel 13531
+Ns = 100000000 and M = 125 took 14967.13021826744 seconds on pixel 5681
+Ns = 100000000 and M = 175 took 18665.634557724 seconds on pixel 61144
+Ns = 500000000 and M = 25 took 35420.45993614197 seconds on pixel 64550
+Ns = 500000000 and M = 75 took 61061.8352227211 seconds on pixel 33049
+Ns = 500000000 and M = 125 took 74886.33059191704 seconds on pixel 5994
+Ns = 10000000 and M = 125 took 2161.401711702347 seconds on pixel 5994
+Ns = 500000000 and M = 175 took 93174.76206541061 seconds on pixel 11898

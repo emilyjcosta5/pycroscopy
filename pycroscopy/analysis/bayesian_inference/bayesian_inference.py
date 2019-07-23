@@ -114,7 +114,7 @@ class AdaptiveBayesianInference(Process):
 
 		#print("Ran init. self.params_dict is {}".format(self.params_dict))
 
-	def test(self, pix_ind=None):
+	def test(self, pix_ind=None, traces=False):
 		"""
 		Tests the Bayesian inference on a single pixel (randomly chosen unless manually specified) worth of data.
 		Displays the resulting figure (resistances with variance, and reconstructed current)
@@ -135,7 +135,7 @@ class AdaptiveBayesianInference(Process):
 		full_i_meas = get_shifted_response(self.h5_main[pix_ind, ::self.parse_mod], self.shift_index)
 
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
-		return pix_ind, process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, pix_ind=pix_ind, graph=True, verbose=True)
+		return pix_ind, process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, pix_ind=pix_ind, traces=traces, graph=True, verbose=True)
 
 	def plotPixel(self, pix_ind=None):
 		if pix_ind is None:

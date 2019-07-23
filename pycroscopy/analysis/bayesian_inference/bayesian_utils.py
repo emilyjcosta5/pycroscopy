@@ -65,7 +65,7 @@ def get_M_dx_x(V0=6, M=25):
 # Takes in a single period of a shifted excitation wave as full_V and the corresponding
 # current response as full_i_meas. Returns either the estimated resistances and 
 # reconstructed currents or a pyplot figure.
-def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, dvdt, pix_ind=0, graph=False, verbose=False):
+def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0, Ns, dvdt, pix_ind=0, traces=False, graph=False, verbose=False):
     # If verbose, check if full_V and full_i_meas exist and are actually 1D
     if verbose:
         if full_V is None:
@@ -88,8 +88,8 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     dvdtRev = dvdt[split_index:]
 
     # Run the adaptive metropolis on both halves and save the results
-    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, dvdtFor, verbose=verbose)
-    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, dvdtRev, verbose=verbose)
+    forward_results = _run_bayesian_inference(Vfor, Ifor, M, dx, x, f, V0, Ns, dvdtFor, traces=traces, verbose=verbose)
+    reverse_results = _run_bayesian_inference(Vrev, Irev, M, dx, x, f, V0, Ns, dvdtRev, traces=traces, verbose=verbose)
 
     '''
     # If we want a graph, we graph our data and return the figure
@@ -113,6 +113,12 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     capacitance = np.array([forward_results[2], reverse_results[2]])
     i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
     i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
+
+    # If we are tracking traces, then concatenate the traces for R and R_sig
+    if(traces):
+        R_traces = np.concatenate((forward_results[5], reverse_results[5]), axis=1)
+        R_sig_traces = np.concatenate((forward_results[6], reverse_results[6]), axis=1)
+
     # Shift i_recon and i_corrected back to correspond to a sine excitation wave
     i_recon = get_unshifted_response(i_recon, shift_index)
     i_corrected = get_unshifted_response(i_corrected, shift_index)
@@ -122,9 +128,19 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         full_V = get_unshifted_response(full_V, shift_index)
         full_i_meas = get_unshifted_response(full_i_meas, shift_index)
         x = np.concatenate((x, x))
-        return publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, full_V, full_i_meas, i_recon, i_corrected)
+
+        figBoi = publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, full_V, full_i_meas, i_recon, i_corrected)
+
+        if(traces):
+            traces_fig = plotTraces(Ns, x, R_traces, R_sig_traces)
+            return figBoi, traces_fig
+        else:
+            return figBoi
     else:
-        return R, R_sig, capacitance, i_recon, i_corrected
+        if(traces):
+            return R, R_sig, capacitance, i_recon, i_corrected, R_traces, R_sig_traces
+        else:
+            return R, R_sig, capacitance, i_recon, i_corrected
 
 # Helper function because Numba crashes when it isn't supposed to
 @jit(nopython=True)
@@ -148,7 +164,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
 
 
-def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False):
+def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, traces=False, verbose=False):
     '''
     Takes in raw filtered data, parses it down and into forward and reverse sweeps,
     and runs an adaptive metropolis alglrithm on the data. Then calculates the
@@ -293,6 +309,12 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         # return zero versions of R, R_sig, capacitance, i_recon, i_corrected
         return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
     
+    # If we are storing traces, instantiate an array to store traces with
+    if traces:
+        numTraces = 10
+        traceInc = Ns//numTraces
+        R_traces = np.zeros((numTraces, x.size))
+        R_sig_traces = np.zeros((numTraces, x.size))
 
     # Now we are ready to start the active metropolis
     if verbose:
@@ -364,6 +386,16 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             if verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
 
+        # Save our traces
+        if traces and ((i+1) % traceInc == 0):
+            # Mean and variance of resistance
+            meanr = np.matmul(np.exp(P[:M,:]), np.ones((num_samples, 1))) / num_samples
+            mom2r = np.matmul(np.exp(P[:M,:]), np.exp(P[:M,:]).T) / num_samples
+            varr = mom2r - np.matmul(meanr, meanr.T)
+
+            R_traces[i//traceInc] = meanr.T.astype(np.float)
+            R_sig_traces[i//traceInc] = np.sqrt(np.diag(varr[:M, :M])).astype(np.float)
+
         i += 1
         j += 1
 
@@ -395,7 +427,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
 
     #breakpoint()
 
-    return R, R_sig, capacitance, i_recon, i_corrected
+    if traces:
+        return R, R_sig, capacitance, i_recon, i_corrected, R_traces, R_sig_traces
+    else:
+        return R, R_sig, capacitance, i_recon, i_corrected
 
 
 def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
@@ -474,3 +509,45 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
 
     return result
 
+def plotTraces(Ns, x, R_traces, R_sig_traces):
+    rLenHalf = x.size//2
+    numTraces = R_sig_traces.shape[0]
+    increment = Ns//numTraces
+
+    # Clean up R and R_sig for unsuccessfully predicted resistances
+    for i in range(numTraces):
+        for j in range(rLenHalf*2):
+            if np.isnan(R_sig_traces[i][j]) or R_sig_traces[i][j] > np.amax(R_sig_traces[-1] + 10) or np.isnan(R_traces[i][j]) or R_traces[i][j] > np.amax(R_sig_traces[-1] + 10):
+                R_sig_traces[i][j] = np.nan
+                R_traces[i][j] = np.nan
+
+    traceBoi = plt.figure()
+    colors = ["purple", "blueviolet", "b", "cadetblue", "g", "greenyellow", "gold", "darkorange", "orangered", "maroon"]
+
+    plt.subplot(121)
+    plt.title("Forward resistance traces")
+    # Plot traces
+    for i in range(numTraces-1):
+        plt.plot(x[:rLenHalf], R_traces[i][:rLenHalf], color=colors[i%len(colors)], alpha=(i+2)/numTraces, linewidth=0.5, label="{} iterations".format(increment*(i+1)))
+        #plt.plot(x[:rLenHalf], R_traces[i][:rLenHalf]+R_sig_traces[i][:rLenHalf], "b:", alpha=(i+2)/numTraces, linewidth=0.5)
+        #plt.plot(x[:rLenHalf], R_traces[i][:rLenHalf]-R_sig_traces[i][:rLenHalf], "b:", alpha=(i+2)/numTraces, linewidth=0.5)
+    # Plot final result
+    plt.plot(x[:rLenHalf], R_traces[-1][:rLenHalf], "rx-", color=colors[-1], alpha=0.6, label="{} iterations".format(Ns))
+    plt.plot(x[:rLenHalf], R_traces[-1][:rLenHalf]+R_sig_traces[-1][:rLenHalf], "r:", color=colors[-1], alpha=0.6)
+    plt.plot(x[:rLenHalf], R_traces[-1][:rLenHalf]-R_sig_traces[-1][:rLenHalf], "r:", color=colors[-1], alpha=0.6)
+    plt.legend()
+
+    plt.subplot(122)
+    plt.title("Reverse resistance traces")
+    # Plot traces
+    for i in range(numTraces-1):
+        plt.plot(x[rLenHalf:], R_traces[i][rLenHalf:], color=colors[i%len(colors)], alpha=(i+2)/numTraces, linewidth=0.5, label="{} iterations".format(increment*(i+1)))
+        #plt.plot(x[rLenHalf:], R_traces[i][rLenHalf:]+R_sig_traces[i][rLenHalf:], "b:", alpha=(i+2)/numTraces, linewidth=0.5)
+        #plt.plot(x[rLenHalf:], R_traces[i][rLenHalf:]-R_sig_traces[i][rLenHalf:], "b:", alpha=(i+2)/numTraces, linewidth=0.5)
+    # Plot final result
+    plt.plot(x[rLenHalf:], R_traces[-1][rLenHalf:], "rx-", color=colors[-1], alpha=0.6, label="{} iterations".format(Ns))
+    plt.plot(x[rLenHalf:], R_traces[-1][rLenHalf:]+R_sig_traces[-1][rLenHalf:], "r:", color=colors[-1], alpha=0.6)
+    plt.plot(x[rLenHalf:], R_traces[-1][rLenHalf:]-R_sig_traces[-1][rLenHalf:], "r:", color=colors[-1], alpha=0.6)
+    plt.legend()
+
+    return traceBoi
