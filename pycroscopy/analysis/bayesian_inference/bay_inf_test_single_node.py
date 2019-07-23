@@ -15,6 +15,6 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     abi = AdaptiveBayesianInference(h5_resh, Ns=int(10), verbose=True)
 
     fig1, fig2 = abi.test()
-    #plt.savefig("result0.png")
+    plt.savefig("result0.png")
     #plt.savefig("result1.png")
 
