@@ -203,9 +203,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     sigma = 1
 
     tmax = 1/f/2
-    t = np.linspace(0, tmax, V.size)
+    t = numpy.linspace(0, tmax, V.size)
     dt = t[1] - t[0]
-    dV = np.diff(V)/dt
+    dV = numpy.diff(V)/dt
     dV = numpy.append(dV, dV[dV.size-1])
     N = V.size
     #dx = 2*V0/(M-2)
