@@ -42,14 +42,14 @@ def get_shift_and_split_indices(full_V):
     while(full_V[split_index] < full_V[split_index + 1]):
         split_index += 1
 
-    return full_V, shift_index, split_index
+    return numpy.asarray(full_V), shift_index, split_index
 
 
 # Takes in a full_i_meas response and shifts it according to the given shift index
 def get_shifted_response(full_i_meas, shift_index):
     full_i_meas = np.asarray(full_i_meas)
     shift_index = np.asarray(shift_index)
-    return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
+    return numpy.asarray(np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index])))
 
 
 # Takes a shifted array and un-shifts it according to the given shift index
