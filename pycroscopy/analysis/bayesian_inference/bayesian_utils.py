@@ -359,7 +359,13 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             #print("P's shape is {}".format(P.shape))
             # Approximate L such that L*L' = Sigma, where the second term is a
             # decaying regularization
-            S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
+            # for some reason this may throw a np.linalg.LinAlgError: Matrix is not positive definite
+            # If this fails, just return zeros
+            try:
+                S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
+            except np.linalg.LinAlgError:
+                print("Cholesky failed on iteration {}".format(i+1))
+                return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
 
             if verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
