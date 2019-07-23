@@ -42,18 +42,20 @@ def get_shift_and_split_indices(full_V):
     while(full_V[split_index] < full_V[split_index + 1]):
         split_index += 1
 
-    return numpy.asarray(full_V), shift_index, split_index
+    return full_V, shift_index, split_index
 
 
 # Takes in a full_i_meas response and shifts it according to the given shift index
 def get_shifted_response(full_i_meas, shift_index):
     full_i_meas = np.asarray(full_i_meas)
     shift_index = np.asarray(shift_index)
-    return numpy.asarray(np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index])))
+    return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
 
 
 # Takes a shifted array and un-shifts it according to the given shift index
 def get_unshifted_response(full_i_meas, shift_index):
+    full_i_meas = np.asarray(full_i_meas)
+    shift_index = np.asarray(shift_index)
     new_shift_index = full_i_meas.size - shift_index
     return np.concatenate((full_i_meas[new_shift_index:], full_i_meas[:new_shift_index]))
 
@@ -61,7 +63,10 @@ def get_unshifted_response(full_i_meas, shift_index):
 # Takes in excitation wave amplitude and desired M value. Returns M, dx, and x.
 def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
-    x = numpy.arange(-V0, V0+dx, dx)[np.newaxis].T
+    #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
+    x = np.arange(-V0, V0+dx, dx)
+    x = np.expand_dims(x,0)
+    x = np.transpose(x)
     M = x.size # M may not be the desired value but it will be very close
     return M, dx, x
 
