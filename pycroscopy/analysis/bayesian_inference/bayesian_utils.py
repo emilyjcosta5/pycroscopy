@@ -28,6 +28,7 @@ def get_shift_and_split_indices(full_V):
     # we want to take the last bit that goes up and move it to the
     # front, such that the data first goes from -6 to 6 V, then
     # from 6 to -6 V.
+    full_V = np.asarray(full_V)
     shift_index = full_V.size - 1
     while(full_V[shift_index-1] < full_V[shift_index]):
         shift_index -= 1
