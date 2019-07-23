@@ -65,7 +65,9 @@ def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
     #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
     x = numpy.arange(-V0, V0+dx, dx)
+    breakpoint()
     print(x.dtype)
+    breakpoint()
     x = np.asarray(x)
     x = np.expand_dims(x,0)
     x = np.transpose(x)
