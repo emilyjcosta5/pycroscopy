@@ -64,7 +64,8 @@ def get_unshifted_response(full_i_meas, shift_index):
 def get_M_dx_x(V0=6, M=25):
     dx = 2*V0/(M-2)
     #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
-    x = np.arange(-V0, V0+dx, dx)
+    x = numpy.arange(-V0, V0+dx, dx)
+    x = np.asarray(x)
     x = np.expand_dims(x,0)
     x = np.transpose(x)
     M = x.size # M may not be the desired value but it will be very close
