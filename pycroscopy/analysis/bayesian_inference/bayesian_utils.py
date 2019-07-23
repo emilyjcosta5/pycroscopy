@@ -17,7 +17,7 @@ import pycroscopy as px
 import pyUSID as usid 
 
 # Library to speed up adaptive metropolis
-from numba import jit 
+#from numba import jit 
 
 # Takes in the sine full_V wave and finds the index used to shift the waveform into
 # a forward and reverse sweep. Then finds the index of the maximum value (i.e. the
@@ -127,7 +127,7 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
         return R, R_sig, capacitance, i_recon, i_corrected
 
 # Helper function because Numba crashes when it isn't supposed to
-@jit(nopython=True)
+#@jit(nopython=True)
 def _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm):
     out = np.linalg.norm(V*np.exp(-A[:, :-1] @ pp[:-2]) +\
           pp[-2][0] * (dV + pp[-1][0]*V) - y)**2/2/gam/gam + (((pp[:-2]-mm[:-2]).T @ P0) @ (pp[:-2]-mm[:-2]))[0][0]/2
