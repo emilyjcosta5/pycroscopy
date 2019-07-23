@@ -46,6 +46,8 @@ def get_shift_and_split_indices(full_V):
 
 # Takes in a full_i_meas response and shifts it according to the given shift index
 def get_shifted_response(full_i_meas, shift_index):
+    full_i_meas = np.asarray(full_i_meas)
+    shift_index = np.asarray(shift_index)
     return np.concatenate((full_i_meas[shift_index:], full_i_meas[:shift_index]))
 
 
