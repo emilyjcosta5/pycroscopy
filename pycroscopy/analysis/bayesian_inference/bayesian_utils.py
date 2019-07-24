@@ -212,11 +212,11 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     tmax = 1/f/2
     t = numpy.linspace(0, tmax, V.size)
     dt = t[1] - t[0]
-    print(V.dtype)
+    dV = np.diff(V)
     print(dt.dtype)
     breakpoint()
-    dV = np.diff(V)
     dV = np.divide(dV,dt)
+    breakpoint()
     dV = np.concatenate((dV, np.array([dV[-1]])))
     N = V.size
     #dx = 2*V0/(M-2)
