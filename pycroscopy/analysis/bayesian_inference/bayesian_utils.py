@@ -217,10 +217,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     dV = np.divide(dV,dt)
     print(dV.shape)
     print(dV[-1].shape)
-    breakpoint()
     dV = np.concatenate((dV,np.asarray([dV[-1]], dtype='float64')))
-    breakpoint()
     N = V.size
+    breakpoint()
     #dx = 2*V0/(M-2)
     #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
     #M = x.size # M may not be the desired value but it will be very close
