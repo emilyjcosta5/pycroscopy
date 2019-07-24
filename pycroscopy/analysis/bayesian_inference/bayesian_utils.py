@@ -237,8 +237,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
         ix = math.floor((V[j] + V0)/dx) + 1
-        print(ix.shape)
-        ix = min(ix, -1)
+        print("A shape " + A.shape)
+        print("j " + j)
+        print("x shape " + x.shape)
+        ix = min(ix, x.size - 1)
         ix = max(ix, 1)
         A[j, ix] = (V[j] - x[ix-1])/(x[ix] - x[ix-1])
         breakpoint()
