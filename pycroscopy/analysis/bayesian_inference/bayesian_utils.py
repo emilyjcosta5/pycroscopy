@@ -228,10 +228,15 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     # Note: V has to be a row vector for np.diff(V) and
     # max(V) to work properly
     dV = np.transpose(np.expand_dims(dV, axis=0))
+    print(V.shape)
     breakpoint()
     #dV = dV[np.newaxis].T
-    V = V[np.newaxis].T
-    i_meas = i_meas[np.newaxis].T
+    V = np.transpose(np.expand_dims(V, axis=0))
+    # V = V[np.newaxis].T
+    print(i_meas.shape)
+    breakpoint()
+    i_meas = np.transpose(np.expand_dims(i_meas, axis=0))
+    #i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
     A = np.zeros((N, M + 1))
