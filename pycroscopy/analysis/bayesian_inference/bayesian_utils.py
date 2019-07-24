@@ -230,11 +230,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
     A1 = np.zeros((N, M + 1))
-    breakpoint()
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
-        breakpoint()
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
         A1[j, ix] = V[j]*(V[j] - x[ix-1])/(x[ix] - x[ix-1])
