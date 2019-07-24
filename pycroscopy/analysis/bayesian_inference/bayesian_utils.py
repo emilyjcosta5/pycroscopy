@@ -227,7 +227,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     # Change V and dV into column vectors for computations
     # Note: V has to be a row vector for np.diff(V) and
     # max(V) to work properly
-    dV = dV[np.newaxis].T
+    dV = np.transpose(np.expand_dims(dV, axis=0))
+    breakpoint()
+    #dV = dV[np.newaxis].T
     V = V[np.newaxis].T
     i_meas = i_meas[np.newaxis].T
 
