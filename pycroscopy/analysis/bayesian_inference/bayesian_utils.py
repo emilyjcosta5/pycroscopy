@@ -232,6 +232,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     #i_meas = i_meas[np.newaxis].T
 
     # Build A : the forward map
+    #look to optimize for-loop
     A = np.zeros((N, M + 1))
     for j in range(N):
         # Note: ix will be used to index into arrays, so it is one less
@@ -243,12 +244,13 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
         print(ix)
-        print(int(np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1]))))
         A[j, ix] = int(np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1])))
         A[j, ix-1] = int(np.subtract(1, np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1]))))
         #A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
-    A[:, M] = np.transpose(np.add(dV,ff*r_extra*V)) # take the transpose cuz python is dumb
-
+    print(np.transpose(np.add(dV,ff*r_extra*V)))
+    A[:, M] = np.transpose(np.add(dV,ff*r_extra*V))
+    breakpoint()
+    
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
     A1 = np.zeros((N, M + 1))
