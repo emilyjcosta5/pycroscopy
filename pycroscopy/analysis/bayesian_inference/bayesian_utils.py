@@ -218,7 +218,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     print(dV.shape)
     print(dV[-1].shape)
     breakpoint()
-    dV = np.concatenate((dV,np.asarray([dV[-1]], dtype='float64')), axis=1)
+    dV = np.concatenate((dV,np.asarray([dV[-1]], dtype='float64')))
     breakpoint()
     N = V.size
     #dx = 2*V0/(M-2)
