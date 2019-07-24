@@ -215,11 +215,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     dV = np.diff(V)
     print(dt.dtype)
     dV = np.divide(dV,dt)
-    print(dV.shape)
-    print(dV[-1].shape)
     dV = np.concatenate((dV,np.asarray([dV[-1]], dtype='float64')))
     N = V.size
-    breakpoint()
     #dx = 2*V0/(M-2)
     #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
     #M = x.size # M may not be the desired value but it will be very close
@@ -228,15 +225,12 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     # Note: V has to be a row vector for np.diff(V) and
     # max(V) to work properly
     dV = np.transpose(np.expand_dims(dV, axis=0))
-    print(V.shape)
-    breakpoint()
     #dV = dV[np.newaxis].T
     V = np.transpose(np.expand_dims(V, axis=0))
     # V = V[np.newaxis].T
-    print(i_meas.shape)
-    breakpoint()
     i_meas = np.transpose(np.expand_dims(i_meas, axis=0))
     #i_meas = i_meas[np.newaxis].T
+    breakpoint()
 
     # Build A : the forward map
     A = np.zeros((N, M + 1))
@@ -387,12 +381,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             try:
                 S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
             except np.linalg.LinAlgError:
-                print("Cholesky failed on iteration {}. Trying again with larger regularization".format(i+1))
-                try:
-                    S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-2)*np.eye(M+2)/(j+1))
-                except: np.linalg.LinAlgError:
-                    print("Cholesky failed again. Stopping inference and returning all zeros.")
-                    return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
+                print("Cholesky failed on iteration {}".format(i+1))
+                return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
 
             if verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
