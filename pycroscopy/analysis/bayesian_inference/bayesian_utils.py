@@ -245,11 +245,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         print(ix)
         print(int(np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1]))))
         A[j, ix] = int(np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1])))
-        breakpoint()
         A[j, ix-1] = int(np.subtract(1, np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1]))))
-        breakpoint()
         #A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
-    A[:, M] = (dV + ff*r_extra*V).T # take the transpose cuz python is dumb
+    A[:, M] = np.transpose(np.add(dV,ff*r_extra*V)) # take the transpose cuz python is dumb
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
@@ -259,6 +257,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         ix = math.floor((V[j] + V0)/dx)+1
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
+        breakpoint()
         A1[j, ix] = V[j]*(V[j] - x[ix-1])/(x[ix] - x[ix-1])
         A1[j, ix-1] = V[j]*(1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]))
     A1[:, M] = (dV + ff*r_extra*V).T # transpose again here
