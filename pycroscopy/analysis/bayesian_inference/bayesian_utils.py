@@ -238,17 +238,17 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         # Note: ix will be used to index into arrays, so it is one less
         # than the ix used in the Matlab code
         ix = math.floor((V[j] + V0)/dx) + 1
-        print(A.shape)
-        print(j)
-        print(x.shape)
+        #print(A.shape)
+        #print(j)
+        #print(x.shape)
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
-        print(ix)
+        #print(ix)
         A[j, ix] = int(np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1])))
         A[j, ix-1] = int(np.subtract(1, np.divide(np.subtract(V[j],x[ix-1]),np.subtract(x[ix],x[ix-1]))))
         #A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
-    print((np.transpose(np.add(dV,ff*r_extra*V))).shape)
-    A[:, M] = np.asarray(np.transpose(np.add(dV,ff*r_extra*V)))
+    print((np.add(dV,ff*r_extra*V)).shape)
+    A[:, M] = np.asarray(np.add(dV,ff*r_extra*V))
     breakpoint()
     
     # Similar to above, but used to simulate data and invert for E(s|y)
