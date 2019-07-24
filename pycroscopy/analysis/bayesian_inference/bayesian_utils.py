@@ -215,8 +215,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     print(V.dtype)
     print(dt.dtype)
     breakpoint()
-    dV = numpy.diff(V)/dt
-    dV = numpy.append(dV, dV[dV.size-1])
+    dV = np.diff(V)
+    dV = np.divide(dV,dt)
+    dV = np.concatenate((dV, dV[-1]))
     N = V.size
     #dx = 2*V0/(M-2)
     #x = np.arange(-V0, V0+dx, dx)[np.newaxis].T
