@@ -225,19 +225,19 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         ix = max(ix, 1)
         A[j, ix] = (V[j] - x[ix-1])/(x[ix] - x[ix-1])
         A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
-    A[:, M] = (dV + ff*r_extra*V).T # take the transpose cuz python is dumb
+    A[:, M] = (dV + ff*r_extra*V).T 
 
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
+    
     A1 = np.zeros((N, M + 1))
     for j in range(N):
-        # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
         A1[j, ix] = V[j]*(V[j] - x[ix-1])/(x[ix] - x[ix-1])
         A1[j, ix-1] = V[j]*(1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]))
-    A1[:, M] = (dV + ff*r_extra*V).T # transpose again here
+    A1[:, M] = (dV + ff*r_extra*V).T 
 
     # A rough guess for the initial condition is a bunch of math stuff
     # This is an approximation of the Laplacian
