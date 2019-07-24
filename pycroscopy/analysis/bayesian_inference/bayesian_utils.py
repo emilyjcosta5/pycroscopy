@@ -243,9 +243,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
         print(ix)
-        print(np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1])))
+        print(int(np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1]))))
         breakpoint()
-        A[j, ix] = np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1]))
+        A[j, ix] = int(np.divide((np.subtract(V[j],x[ix-1])),np.subtract(x[ix],x[ix-1])))
         breakpoint()
         A[j, ix-1] = (1 - (V[j] - x[ix-1])/(x[ix] - x[ix-1]));
     A[:, M] = (dV + ff*r_extra*V).T # take the transpose cuz python is dumb
