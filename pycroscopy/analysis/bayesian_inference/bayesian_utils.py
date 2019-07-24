@@ -382,8 +382,12 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             try:
                 S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
             except np.linalg.LinAlgError:
-                print("Cholesky failed on iteration {}".format(i+1))
-                return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
+                print("Cholesky failed on iteration {}. Trying again with larger regularization".format(i+1))
+                try:
+                    S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-2)*np.eye(M+2)/(j+1))
+                except: np.linalg.LinAlgError:
+                    print("Cholesky failed again. Stopping inference and returning all zeros.")
+                    return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
 
             if verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
