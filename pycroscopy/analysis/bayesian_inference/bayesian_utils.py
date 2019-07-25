@@ -306,7 +306,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     r_extra_exp = cp.expand_dims(r_extra_exp, axis=0)
     mm = cp.concatenate((mr, r_extra_exp))
     #print(mm.shape) is (126,1)
-    mm = cp.transpose(cp.expand_dims(mm, axis=1))
+    mm = cp.transpose(cp.expand_dims(mm, axis=0))
     print(mm.shape)
     #mm = cp.append(mr, r_extra)[cp.newaxis].T
     ppp = mm.astype(cp.float64)
