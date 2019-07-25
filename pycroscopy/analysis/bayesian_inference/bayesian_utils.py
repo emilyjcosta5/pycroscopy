@@ -477,7 +477,7 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
 
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(rLenHalf*2):
-        if cp.isnan(R_sig[i]) or R_sig[i] > 100:
+        if np.isnan(R_sig[i]) or R_sig[i] > 100:
             R_sig[i] = cp.nan
             R[i] = cp.nan
 
