@@ -301,11 +301,13 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     S2 = cp.matmul(S, S.T)
     S1 = cp.zeros((M+2, 1))
     print(mr.shape)
-    mm = cp.concatenate((mr, r_extra))
+    print(type(mr))
+    mm = cp.concatenate((mr, cp.asarray(r_extra)))
     print(mm.shape)
     mm = cp.transpose(cp.expand_dims(mm))
     #mm = cp.append(mr, r_extra)[cp.newaxis].T
     ppp = mm.astype(cp.float64)
+    breakpoint()
 
     # for some reason, this may throw a cp.linalg.LinAlgError: Singular Matrix
     # when trying to process the 0th pixel. After exiting this try catch block,
