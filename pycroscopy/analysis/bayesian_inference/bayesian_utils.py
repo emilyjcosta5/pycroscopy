@@ -159,7 +159,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
     '''
     return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
 @cuda.jit
-def _for_loop(ix, N, M, V, x, dV, ff, r_extra):
+def _for_loop(ix, N, M, V, x, dV, ff, r_extra, V0, dx):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
     A1 = cp.zeros((N, M + 1))
@@ -277,7 +277,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V)) # transpose again here
     '''
-    A1 = _for_loop(ix, N, M, V, x, dV, ff, r_extra)
+    A1 = _for_loop(ix, N, M, V, x, dV, ff, r_extra,V0, dx)
 
     # A rough guess for the initial condition is a bunch of math stuff
     # This is an approximation of the Laplacian
