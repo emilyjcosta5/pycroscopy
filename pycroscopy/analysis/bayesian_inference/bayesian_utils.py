@@ -119,11 +119,11 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     # Concatenate the forward and reverse results together and return in a tuple
     # for easier parallel processing
     # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
-    R = cp.concatenate((forward_results[0], reverse_results[0]), axis=0)
-    R_sig = cp.concatenate((forward_results[1], reverse_results[1]), axis=0)
-    capacitance = cp.array([forward_results[2], reverse_results[2]])
-    i_recon = cp.concatenate((forward_results[3], reverse_results[3]), axis=0)
-    i_corrected = cp.concatenate((forward_results[4], reverse_results[4]), axis=0)
+    R = np.concatenate((forward_results[0], reverse_results[0]), axis=0)
+    R_sig = np.concatenate((forward_results[1], reverse_results[1]), axis=0)
+    capacitance = np.array([forward_results[2], reverse_results[2]])
+    i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
+    i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
     # Shift i_recon and i_corrected back to correspond to a sine excitation wave
     i_recon = get_unshifted_response(i_recon, shift_index)
     i_corrected = get_unshifted_response(i_corrected, shift_index)
