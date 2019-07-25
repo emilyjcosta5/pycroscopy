@@ -482,6 +482,7 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
             R[i] = cp.nan
 
     #breakpoint()
+    x = cp.asnumpy(x)
     print(type(x))
     print(type(R))
     print(type(R_sig))
