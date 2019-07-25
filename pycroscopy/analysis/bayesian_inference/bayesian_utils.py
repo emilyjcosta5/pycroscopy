@@ -11,6 +11,7 @@ import cupy as cp
 import numpy as np
 import scipy.linalg as spla
 from matplotlib import pyplot as plt
+from numba import cuda
 
 # Libraries for USID database use
 import h5py
@@ -157,6 +158,23 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
           cp.matmul(cp.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
     '''
     return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
+@cuda.jit
+def _for_loop(ix, N, M, V, x, dV, ff, r_extra):
+    start = cuda.grid(1)
+    stride = cuda.gridsize(1)
+    A1 = cp.zeros((N, M + 1))
+    breakpoint
+    for j in range(start, N, stride):
+        # Note: Again, ix is one less than it is in the Matlab code
+        ix = math.floor((V[j] + V0)/dx)+1
+        ix = min(ix, x.size - 1)
+        ix = max(ix, 1)
+        A[j, ix] = int(cp.divide(cp.subtract(V[j],x[ix-1]),cp.subtract(x[ix],x[ix-1])))
+        A[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
+                                                  cp.subtract(x[ix],x[ix-1]))))
+    A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V))
+    breakpoint()
+    return A1
 
 
 def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False):
@@ -248,6 +266,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
+    '''
     A1 = cp.zeros((N, M + 1))
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
@@ -258,6 +277,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         A[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V)) # transpose again here
+    '''
+    A1 = _for_loop(ix, N, M, V, x, dV, ff, r_extra)
 
     # A rough guess for the initial condition is a bunch of math stuff
     # This is an approximation of the Laplacian
@@ -321,8 +342,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     
 
     # Now we are ready to start the active metropolis
-    if verbose:
-        print("Starting active metropolis...")
+    print("Starting active metropolis...")
         met_start_time = time.time()
 
     i = 0
