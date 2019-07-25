@@ -6,10 +6,46 @@ import time
 
 startTime = time.time()
 
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", package])
+
 h5_path = 'pzt_nanocap_6_split_bayesian_compensation_R_correction(EmilyAddedSubset).h5'
 
 #skip mpi for now
 #with h5py.File(h5_path, mode='r+', driver='mpio', comm=MPI.COMM_WORLD) as h5_f:
+module load py-pip
+module load hdf5/1.10.3
+module load python
+try:
+    # This package is not part of anaconda and may need to be installed.
+    import pycroscopy
+except ImportError:
+    warn('wget not found.  Will install with pip.')
+    import pip
+    install('pycroscopy')
+    import pycroscopy
+try:
+    import pyUSID as usid
+except ImportError:
+    warn('pyUSID not found.  Will install with pip.')
+    import pip
+    install('pyUSID')
+    import pyUSID as usid
+try:
+    import numba
+except ImportError:
+    warn('pyUSID not found.  Will install with pip.')
+    import numba
+    install('pyUSID')
+    import numba
+try:
+    # This package is not part of anaconda and may need to be installed.
+    import h5py
+except ImportError:
+    warn('wget not found.  Will install with pip.')
+    import pip
+    install('h5py')
+    import h5py
 with h5py.File(h5_path, mode='r+') as h5_f:
     h5_grp = h5_f['Measurement_000/Channel_000']
     #original dataset
