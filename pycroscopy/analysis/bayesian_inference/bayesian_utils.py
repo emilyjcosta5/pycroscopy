@@ -167,8 +167,8 @@ def _for_loop(A1, ix, N, M, V, x, dV, ff, r_extra, V0, dx):
         ix = math.floor((V[j] + V0)/dx)+1
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
-        A[j, ix] = int(cp.divide(cp.subtract(V[j],x[ix-1]),cp.subtract(x[ix],x[ix-1])))
-        A[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
+        A1[j, ix] = int(cp.divide(cp.subtract(V[j],x[ix-1]),cp.subtract(x[ix],x[ix-1])))
+        A1[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V))
     breakpoint()
@@ -271,8 +271,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         ix = math.floor((V[j] + V0)/dx)+1
         ix = min(ix, x.size - 1)
         ix = max(ix, 1)
-        A[j, ix] = int(cp.divide(cp.subtract(V[j],x[ix-1]),cp.subtract(x[ix],x[ix-1])))
-        A[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
+        A1[j, ix] = int(cp.divide(cp.subtract(V[j],x[ix-1]),cp.subtract(x[ix],x[ix-1])))
+        A1[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V)) # transpose again here
     '''
