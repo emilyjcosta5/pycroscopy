@@ -485,7 +485,7 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
     x = cp.asnumpy(x)
     V = cp.asnumpy(V)
     i_meas = cp.asnumpy(i_meas)
-    i_corrected = cp.asnumpy(i_corrected)
+    i_recon = cp.asnumpy(i_recon)
     # Create the figure to be returned
     result = plt.figure()
 
