@@ -300,7 +300,12 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         cp.concatenate((cp.zeros((M, 2)), amp*cp.array([[1e-2, 0], [0, 1e-1]])), axis=0)), axis=1)
     S2 = cp.matmul(S, S.T)
     S1 = cp.zeros((M+2, 1))
-    mm = cp.append(mr, r_extra)[cp.newaxis].T
+    print(mr.shape)
+    print(r_extra.shape)
+    print(mm.shape)
+    mm = cp.concatenate((mr, r_extra))
+    mm = cp.transpose(cp.expand_dims(mm))
+    #mm = cp.append(mr, r_extra)[cp.newaxis].T
     ppp = mm.astype(cp.float64)
 
     # for some reason, this may throw a cp.linalg.LinAlgError: Singular Matrix
