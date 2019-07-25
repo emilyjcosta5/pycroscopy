@@ -213,7 +213,6 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     t = np.linspace(0, tmax, V.size)
     dt = t[1] - t[0]
     dV = cp.diff(V)
-    print(dt.dtype)
     dV = cp.divide(dV,dt)
     dV = cp.concatenate((dV,cp.asarray([dV[-1]], dtype='float64')))
     N = V.size
@@ -294,7 +293,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     SP = 1/num_samples*cp.matmul(RR - cp.tile(mr, (1, num_samples)), (RR - cp.tile(mr, (1, num_samples))).T)
     amp = 100
     C0 = amp**2 * SP[:M, :M]
-    SR = spla.sqrtm(C0)
+    SR = cp.sqrt(C0)
 
     # Initial guess for Sigma from Eq 1.8 in the notes
     S = cp.concatenate((cp.concatenate((SR, cp.zeros((2, M))), axis=0), 
