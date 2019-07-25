@@ -483,9 +483,9 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
 
     #breakpoint()
     x = cp.asnumpy(x)
-    print(type(x))
-    print(type(R))
-    print(type(R_sig))
+    print(type(V))
+    V = cp.asnumpy(V)
+    i_meas = cp.asnumpy(i_meas)
     # Create the figure to be returned
     result = plt.figure()
 
