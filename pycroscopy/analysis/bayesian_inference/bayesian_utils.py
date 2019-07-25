@@ -259,7 +259,6 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         A[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V)) # transpose again here
-    breakpoint()
 
     # A rough guess for the initial condition is a bunch of math stuff
     # This is an approximation of the Laplacian
