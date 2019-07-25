@@ -171,7 +171,6 @@ def _for_loop(A1, ix, N, M, V, x, dV, ff, r_extra, V0, dx):
         A1[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V))
-    breakpoint()
     return A1
 
 
