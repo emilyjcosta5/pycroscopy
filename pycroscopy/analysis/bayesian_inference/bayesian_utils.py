@@ -342,7 +342,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     
 
     # Now we are ready to start the active metropolis
-    print("Starting active metropolis...")
+    if verbose:    
+        print("Starting active metropolis...")
         met_start_time = time.time()
 
     i = 0
