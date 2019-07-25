@@ -443,8 +443,8 @@ def _get_simple_graph(x, R, R_sig, V, i_meas, i_recon, i_corrected):
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(R_sig.size):
         if cp.isnan(R_sig[i]) or R_sig[i] > 100:
-            R_sig[i] = cp.nan
-            R[i] = cp.nan
+            R_sig[i] = np.nan
+            R[i] = np.nan
 
     #breakpoint()
 
@@ -482,7 +482,9 @@ def publicGetGraph(Ns, pix_ind, shift_index, split_index, x, R, R_sig, V, i_meas
             R[i] = cp.nan
 
     #breakpoint()
-
+    print(type(x))
+    print(type(R))
+    print(type(R_sig))
     # Create the figure to be returned
     result = plt.figure()
 
