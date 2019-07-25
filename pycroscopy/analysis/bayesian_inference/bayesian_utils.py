@@ -163,7 +163,6 @@ def _for_loop(ix, N, M, V, x, dV, ff, r_extra):
     start = cuda.grid(1)
     stride = cuda.gridsize(1)
     A1 = cp.zeros((N, M + 1))
-    breakpoint
     for j in range(start, N, stride):
         # Note: Again, ix is one less than it is in the Matlab code
         ix = math.floor((V[j] + V0)/dx)+1
