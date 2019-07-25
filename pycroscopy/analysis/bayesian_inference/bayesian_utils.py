@@ -287,7 +287,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     P = cp.zeros((M+2, num_samples))
 
     # Define prior
-    SS = cp.matmul(spla.sqrtm(Sigma), cp.random.randn(M+1, num_samples)) + cp.tile(m, (1, num_samples))
+    SS = cp.matmul(cp.sqrt(Sigma), cp.random.randn(M+1, num_samples)) + cp.tile(m, (1, num_samples))
     RR = cp.concatenate((cp.log(1/cp.maximum(SS[:M, :], cp.full((SS[:M, :]).shape, 
         cp.finfo(float).eps))), SS[M, :][cp.newaxis]), axis=0)
     mr = 1/num_samples*cp.sum(RR, axis=1)[cp.newaxis].T
