@@ -302,8 +302,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     S1 = cp.zeros((M+2, 1))
     print(mr.shape)
     print(type(mr))
-    print(cp.expand_dims(cp.asarray(r_extra), axis=0).shape)
-    mm = cp.concatenate((mr, cp.expand_dims(cp.asarray(r_extra), axis=0)))
+    print(cp.expand_dims(cp.expand_dims(cp.asarray(r_extra), axis=0).shape, axis=1))
+    mm = cp.concatenate((mr, cp.expand_dims
+        (cp.expand_dims(cp.asarray(r_extra), axis=0).shape, axis=1)))
     print(mm.shape)
     mm = cp.transpose(cp.expand_dims(mm))
     #mm = cp.append(mr, r_extra)[cp.newaxis].T
