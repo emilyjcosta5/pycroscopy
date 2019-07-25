@@ -249,7 +249,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     print((cp.transpose(cp.add(dV,ff*r_extra*V))).shape)
     print(type(M))
     print(A.shape)
-    A[:, M] = cp.transpose(cp.add(dV,ff*r_extra*V))
+    A[:, M] = cp.add(dV,ff*r_extra*V)
     breakpoint()
     
     # Similar to above, but used to simulate data and invert for E(s|y)
