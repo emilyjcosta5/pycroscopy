@@ -248,6 +248,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     print(type(cp.transpose(cp.add(dV,ff*r_extra*V))))
     print((cp.transpose(cp.add(dV,ff*r_extra*V))).shape)
     print(type(M))
+    print(A.shape)
     A[:, M] = cp.transpose(cp.add(dV,ff*r_extra*V))
     breakpoint()
     
