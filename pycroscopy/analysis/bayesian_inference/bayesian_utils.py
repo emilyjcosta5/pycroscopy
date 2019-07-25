@@ -426,10 +426,10 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     i_corrected = i_meas - point_i_cap - point_i_extra
 
     #breakpoint()
-    R = np.asarray(R)
-    R_sig = np.asarray(R_sig)
-    i_recon = np.asarray(i_recon)
-    i_corrected = np.asarray(i_corrected)
+    R = cp.asnumpy(R)
+    R_sig = cp.asnumpy(R_sig)
+    i_recon = cp.asnumpy(i_recon)
+    i_corrected = cp.asnumpy(i_corrected)
     if verbose:
         print(R.shape)
         print(R_sig.shape)
