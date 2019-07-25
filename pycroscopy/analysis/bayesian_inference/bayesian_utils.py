@@ -158,6 +158,7 @@ def _logpo_R1(pp, A, V, dV, y, gam, P0, mm, Rmax, Rmin, Cmax, Cmin):
           cp.matmul(cp.matmul((pp[:-2]-mm[:-2]).T, P0), pp[:-2]-mm[:-2])/2
     '''
     return _logpo_R1_fast(pp, A, V, dV, y, gam, P0, mm)
+#a work in progress
 @cuda.jit
 def _for_loop(A1, ix, N, M, V, x, dV, ff, r_extra, V0, dx):
     start = cuda.grid(1)
@@ -263,7 +264,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     
     # Similar to above, but used to simulate data and invert for E(s|y)
     # for initial condition
-    '''
+    
     A1 = cp.zeros((N, M + 1))
     for j in range(N):
         # Note: Again, ix is one less than it is in the Matlab code
@@ -274,9 +275,9 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
         A1[j, ix-1] = int(cp.subtract(1, cp.divide(cp.subtract(V[j],x[ix-1]),
                                                   cp.subtract(x[ix],x[ix-1]))))
     A1[:, M] = cp.squeeze(cp.add(dV,ff*r_extra*V)) # transpose again here
-    '''
-    A1 = cp.zeros((N, M + 1))
-    A1 = _for_loop(A1, ix, N, M, V, x, dV, ff, r_extra,V0, dx)
+    
+    #A1 = cp.zeros((N, M + 1))
+    #A1 = _for_loop(A1, ix, N, M, V, x, dV, ff, r_extra,V0, dx)
 
     # A rough guess for the initial condition is a bunch of math stuff
     # This is an approximation of the Laplacian
