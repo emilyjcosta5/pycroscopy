@@ -119,10 +119,8 @@ def process_pixel(full_i_meas, full_V, split_index, M, dx, x, shift_index, f, V0
     # Concatenate the forward and reverse results together and return in a tuple
     # for easier parallel processing
     # Note, results are (R, R_sig, capacitance, i_recon, i_corrected)
-    print(forward_results.shape)
-    print(reverse_results.shape)
-    R = cp.concatenate((forward_results[0], reverse_results[0]), axis=0)
-    R_sig = cp.concatenate((forward_results[1], reverse_results[1]), axis=0)
+    R = np.concatenate((forward_results[0], reverse_results[0]), axis=0)
+    R_sig = np.concatenate((forward_results[1], reverse_results[1]), axis=0)
     capacitance = np.array([forward_results[2], reverse_results[2]])
     i_recon = np.concatenate((forward_results[3], reverse_results[3]), axis=0)
     i_corrected = np.concatenate((forward_results[4], reverse_results[4]), axis=0)
@@ -428,11 +426,16 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     i_corrected = i_meas - point_i_cap - point_i_extra
 
     #breakpoint()
-    print(R.shape)
-    print(R_sig.shape)
-    print(capacitance)
-    print(i_recon.shape)
-    print(i_corrected.shape)
+    R = np.asarray(R)
+    R_sig = np.asarray(R_sig)
+    i_recon = np.asarray(i_recon)
+    i_corrected = np.asarray(i_corrected)
+    if verbose:
+        print(R.shape)
+        print(R_sig.shape)
+        print(capacitance)
+        print(i_recon.shape)
+        print(i_corrected.shape)
     return R, R_sig, capacitance, i_recon, i_corrected
 
 
