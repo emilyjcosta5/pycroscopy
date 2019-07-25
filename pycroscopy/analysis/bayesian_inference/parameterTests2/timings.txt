@@ -5,3 +5,9 @@ Ns = 100000000 and M = 75 took 12861.847536087036 seconds on pixel 64550 with tr
 Ns = 100000000 and M = 100 took 14515.826355218887 seconds on pixel 64550 with traces
 Ns = 100000000 and M = 125 took 15538.761160373688 seconds on pixel 64550 with traces
 Ns = 100000000 and M = 150 took 17520.05218219757 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 75 took 12614.678551197052 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 75 took 12678.101135492325 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 100 took 14024.989075422287 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 125 took 15153.771612405777 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 150 took 17106.458580970764 seconds on pixel 64550 with traces
+Ns = 100000000 and M = 175 took 18666.59744286537 seconds on pixel 64550 with traces

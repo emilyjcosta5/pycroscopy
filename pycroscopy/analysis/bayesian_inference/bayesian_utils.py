@@ -300,8 +300,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, traces=False, 
     ppp = mm.astype(np.float64)
 
     # for some reason, this may throw a np.linalg.LinAlgError: Singular Matrix
-    # when trying to process the 0th pixel. After exiting this try catch block,
-    # the concatinations in process pixel fails.
+    # when trying to process the 0th pixel. If it fails, just return zeros.
     try:
         P0 = np.linalg.inv(C0)
     except np.linalg.LinAlgError:
@@ -517,7 +516,7 @@ def plotTraces(Ns, x, R_traces, R_sig_traces):
     # Clean up R and R_sig for unsuccessfully predicted resistances
     for i in range(numTraces):
         for j in range(rLenHalf*2):
-            if np.isnan(R_sig_traces[i][j]) or R_sig_traces[i][j] > np.amax(R_sig_traces[-1] + 10) or np.isnan(R_traces[i][j]) or R_traces[i][j] > np.amax(R_sig_traces[-1] + 10):
+            if np.isnan(R_sig_traces[i][j]) or R_sig_traces[i][j] > 100 or np.isnan(R_traces[i][j]) or R_traces[i][j] > 100:
                 R_sig_traces[i][j] = np.nan
                 R_traces[i][j] = np.nan
 
