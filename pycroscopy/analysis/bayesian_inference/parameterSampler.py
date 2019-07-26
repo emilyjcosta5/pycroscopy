@@ -12,8 +12,8 @@ import pyUSID as usid
 
 h5_path = r"C:\Users\Administrator\Dropbox\GIv Bayesian June 2019\pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
 
-mVals = [25, 75, 125, 175]
-NsVals = [int(1e7), int(5e7), int(1e8), int(5e8), int(1e9)]
+mVals = [100]
+NsVals = [int(7e7)]
 timingResults = np.zeros((len(NsVals), len(mVals)))
 
 with h5py.File(h5_path, mode='r+') as h5_f:

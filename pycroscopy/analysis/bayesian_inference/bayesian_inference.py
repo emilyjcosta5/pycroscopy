@@ -29,7 +29,7 @@ from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shift
 
 
 class AdaptiveBayesianInference(Process):
-	def __init__(self, h5_main, f=200, V0=None, Ns=int(1e7), M=125, parse_mod=1, **kwargs):
+	def __init__(self, h5_main, f=200, V0=None, Ns=int(7e7), M=100, parse_mod=1, **kwargs):
 		"""
 		Bayesian inference is done on h5py dataset object that has already been filtered
 		and reshaped.
