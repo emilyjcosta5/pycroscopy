@@ -13,7 +13,7 @@ import pyUSID as usid
 h5_path = r"C:\Users\Administrator\Dropbox\GIv Bayesian June 2019\pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
 
 mVals = [100]
-NsVals = [int(7e7)]
+NsVals = [int(8e7)]
 timingResults = np.zeros((len(NsVals), len(mVals)))
 
 with h5py.File(h5_path, mode='r+') as h5_f:
@@ -33,7 +33,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
             # record the time it takes to compute one random pixel
             startTime = time.time()
-            pix_ind, figBoi = abi.test()
+            pix_ind, figBoi = abi.test(pix_ind=43763)
             totalTime = time.time() - startTime
 
             # store the time for graphing later

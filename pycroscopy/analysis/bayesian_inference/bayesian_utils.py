@@ -305,6 +305,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     Rmin = 100
     Cmax = 10
     Cmin = 0
+    S3 = 0
     logpold = _logpo_R1(ppp, A, V, dV, i_meas, gam, P0, mm, Rmax, Rmin, Cmax, Cmin)
 
     while i < Ns:
@@ -352,6 +353,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             else:
                 S1lag = (j - Mint)/j*S1lag + np.sum(P[:, jMintStart:jMintEnd] * P[:, jMintStart+1:jMintEnd+1], axis=1)[np.newaxis].T / j
 
+            S3 = S3 + j/(j+1) * np.matmul(P[:, iMintStart:iMintEnd] - S1, (P[:, iMintStart:iMintEnd] - S1).T)
             # Update meani based on Mint batch
             S1 = (j+1-Mint)/(j+1)*S1 + np.sum(P[:, iMintStart:iMintEnd], axis=1)[np.newaxis].T/(j+1)
             # Update Sigma based on Mint batch
@@ -362,7 +364,8 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
             # for some reason this may throw a np.linalg.LinAlgError: Matrix is not positive definite
             # If this fails, just return zeros
             try:
-                S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
+                #S = np.linalg.cholesky(S2 - np.matmul(S1, S1.T) + (1e-3)*np.eye(M+2)/(j+1))
+                S = np.linalg.cholesky(S3/(j+1))
             except np.linalg.LinAlgError:
                 print("Initial Cholesky failed on iteration {}. Retrying with larger regularization.".format(i+1))
                 try:

@@ -1,0 +1,2 @@
+Ns = 70000000 and M = 100 took 10388.530494689941 seconds on pixel 43763
+Ns = 100000000 and M = 100 took 14037.407532215118 seconds on pixel 43763
