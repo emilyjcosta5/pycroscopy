@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#PBS -N NumbaTiming
+#PBS -A birthright
+#PBS -W group_list=cades-birthright
+#PBS -t 0-9
+#PBS -k n
+#PBS -l nodes=2:ppn=64,qos=std,walltime=8:00:00
+#PBS -M 29t@ornl.gov
+#PBS -m a
+
+module purge
+module load PE-gnu
+module load python/3.6.3
+module list
+cd $PBS_O_WORKDIR
+pwd
+
+python timingBoi.py
+
+
+

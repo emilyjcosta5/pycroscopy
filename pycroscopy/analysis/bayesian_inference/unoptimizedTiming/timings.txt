@@ -1,0 +1,3 @@
+Processing time in seconds for unoptimized processing
+of 10 random pixels (Ns = 5e8, M=125, no Numpy)
+
