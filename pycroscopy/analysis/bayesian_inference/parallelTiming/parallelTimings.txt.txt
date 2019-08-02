@@ -1,0 +1,3 @@
+Processing time in seconds for processing with Numpy
+of 10 instances of 512 randomly selected pixels in
+parallel (Ns = 7e7, M = 100)

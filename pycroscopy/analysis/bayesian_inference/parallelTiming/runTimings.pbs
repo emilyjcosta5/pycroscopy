@@ -1,0 +1,22 @@
+#!/bin/bash
+
+#PBS -N parallelTiming
+#PBS -A birthright
+#PBS -W group_list=cades-birthright
+#PBS -t 0-9%1
+#PBS -k n
+#PBS -l nodes=1:ppn=32,qos=burst,walltime=02:00:00:00
+#PBS -M 29t@ornl.gov
+#PBS -m a
+
+module purge
+module load PE-gnu
+module load python/3.6.3
+module list
+cd $PBS_O_WORKDIR
+pwd
+
+python bay_inf_script_500subset.py
+
+
+
