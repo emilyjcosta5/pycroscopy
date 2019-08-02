@@ -32,8 +32,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     myDict['X'] = [randNum1, randNum2]
 
     # Creates object from original data
-    #abi = AdaptiveBayesianInference(h5_resh)
-
+    abi = AdaptiveBayesianInference(h5_resh)
     #slice data
     subset = abi.h5_main.slice_to_dataset(slice_dict=myDict)
     #create object from sliced data

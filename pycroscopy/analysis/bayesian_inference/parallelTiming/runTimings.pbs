@@ -3,7 +3,6 @@
 #PBS -N parallelTiming
 #PBS -A birthright
 #PBS -W group_list=cades-birthright
-#PBS -t 0-9%1
 #PBS -k n
 #PBS -l nodes=1:ppn=32,qos=burst,walltime=02:00:00:00
 #PBS -M 29t@ornl.gov
