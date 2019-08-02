@@ -13,8 +13,29 @@ from matplotlib import pyplot as plt
 
 # Libraries for USID database use
 import h5py
-import pycroscopy as px 
-import pyUSID as usid 
+
+# Helper for importing packages
+import os
+import subprocess
+import sys
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", "--user", package])
+
+try:
+    import pyUSID as usid
+except ImportError:
+    print("pyUSID not found. Will install with pip.")
+    import pip
+    install("pyUSID")
+    import pyUSID as usid
+
+try:
+    import pycroscopy as px
+except ImportError:
+    print("pycroscopy not found. Will install with pip.")
+    import pip
+    install("pycroscopy")
+    import pycroscopy as px
 
 # Library to speed up adaptive metropolis
 from numba import jit 

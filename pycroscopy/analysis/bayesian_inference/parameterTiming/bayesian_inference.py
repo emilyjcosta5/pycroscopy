@@ -12,6 +12,30 @@ Created on Tue July 02, 2019
 from __future__ import division, print_function, absolute_import, unicode_literals
 import h5py
 import numpy as np
+
+# Helper for importing packages
+import os
+import subprocess
+import sys
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", "--user", package])
+
+try:
+    import pyUSID as usid
+except ImportError:
+    print("pyUSID not found. Will install with pip.")
+    import pip
+    install("pyUSID")
+    import pyUSID as usid
+
+try:
+    import pycroscopy as px
+except ImportError:
+    print("pycroscopy not found. Will install with pip.")
+    import pip
+    install("pycroscopy")
+    import pycroscopy as px
+
 from pyUSID.processing.process import Process
 # Set up parallel compute later to run through supercomputer or cluster
 from pyUSID.processing.comp_utils import parallel_compute
@@ -22,8 +46,6 @@ from pyUSID.io.write_utils import Dimension
 import time
 import math
 import scipy.linalg as spla 
-import pycroscopy as px 
-import pyUSID as usid
 
 from bayesian_utils import get_shift_and_split_indices, process_pixel, get_shifted_response, get_unshifted_response, get_M_dx_x, publicGetGraph
 

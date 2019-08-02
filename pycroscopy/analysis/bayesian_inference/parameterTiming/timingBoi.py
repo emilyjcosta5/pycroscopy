@@ -1,16 +1,34 @@
 # This script runs through a few values for M and Ns and times
 # how long it takes to process a single pixel
 
+import os
+import subprocess
+import sys
 import h5py
 import io
 import time
-from bayesian_inference import AdaptiveBayesianInference
 from matplotlib import pyplot as plt
-import pyUSID as pyUSID
 import numpy as np 
-import pyUSID as usid
+from shutil import copyfile
 
-h5_path = r"/lustre/or-hydra/cades-birthright/29t/pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
+# Helper for importing packages
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", "--user", package])
+
+try:
+    import pyUSID as usid
+except ImportError:
+    print("pyUSID not found. Will install with pip.")
+    import pip
+    install("pyUSID")
+    import pyUSID as usid
+
+from bayesian_inference import AdaptiveBayesianInference
+
+# Make a copy of the dataset so multiple processes can access it at the same time
+h5_og_path = r"/home/29t/pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
+h5_path = r"/lustre/or-hydra/cades-birthright/29t/dataBoi{}.h5".format(time.time())
+copyfile(h5_og_path, h5_path)
 
 M = 100
 Ns = int(7e7)
@@ -23,6 +41,8 @@ with h5py.File(h5_path, mode='r+') as h5_f:
 
     h5_resh = h5_f['Measurement_000/Channel_000/Raw_Data-FFT_Filtering_000/Filtered_Data-Reshape_000/Reshaped_Data']
 
+    print(usid.hdf_utils.check_if_main(h5_resh, verbose=True))
+
     # initialize the Process with the desired parameters
     abi = AdaptiveBayesianInference(h5_resh, f=f, V0=V0, Ns=Ns, M=M)
 
@@ -30,6 +50,9 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     startTime = time.time()
     pixResultBoi = abi.test()
     totalTime = time.time() - startTime
+
+# delete the copy of the dataset we created
+os.remove(h5_path)
 
 # record the time in a file pixel by pixel so we don't have to wait for all
 # the pixels to finish (in case something crashes haha)
