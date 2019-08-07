@@ -1,0 +1,957 @@
+Currently Loaded Modulefiles:
+  1) gcc/5.3.0        3) xalt/0.7.6       5) python/3.6.3
+  2) openmpi/1.10.3   4) PE-gnu/1.0
+[or-condo-c57:45146] *** Process received signal ***
+[or-condo-c57:45146] Signal: Segmentation fault (11)
+[or-condo-c57:45146] Signal code: Address not mapped (1)
+[or-condo-c57:45146] Failing at address: 0x3afeb48
+[or-condo-c57:45160] *** Process received signal ***
+[or-condo-c57:45160] Signal: Segmentation fault (11)
+[or-condo-c57:45160] Signal code: Address not mapped (1)
+[or-condo-c57:45160] Failing at address: 0x3afedd8
+Currently Loaded Modulefiles:
+  1) gcc/5.3.0        3) xalt/0.7.6       5) python/3.6.3
+  2) openmpi/1.10.3   4) PE-gnu/1.0
+[or-condo-c57:64541] *** Process received signal ***
+[or-condo-c57:64541] Signal: Segmentation fault (11)
+[or-condo-c57:64541] Signal code: Address not mapped (1)
+[or-condo-c57:64541] Failing at address: 0x2c29ba8
+[or-condo-c57:64556] *** Process received signal ***
+[or-condo-c57:64556] Signal: Segmentation fault (11)
+[or-condo-c57:64556] Signal code: Address not mapped (1)
+[or-condo-c57:64556] Failing at address: 0x2c29e38
+Currently Loaded Modulefiles:
+  1) gcc/5.3.0        3) xalt/0.7.6       5) python/3.6.3
+  2) openmpi/1.10.3   4) PE-gnu/1.0
+[or-condo-c89:10468] *** Process received signal ***
+[or-condo-c89:10468] Signal: Segmentation fault (11)
+[or-condo-c89:10468] Signal code: Address not mapped (1)
+[or-condo-c89:10468] Failing at address: 0x454dc80
+[or-condo-c89:10468] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10468] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10468] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10468] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10468] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10468] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10468] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10468] [ 7] python[0x586026]
+[or-condo-c89:10468] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10468] [ 9] python[0x53fb54]
+[or-condo-c89:10468] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [11] python[0x53eb01]
+[or-condo-c89:10468] [12] python[0x53fc97]
+[or-condo-c89:10468] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [14] python[0x53eb01]
+[or-condo-c89:10468] [15] python[0x53fc97]
+[or-condo-c89:10468] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [17] python[0x53eb01]
+[or-condo-c89:10468] [18] python[0x53fc97]
+[or-condo-c89:10468] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [20] python[0x53eb01]
+[or-condo-c89:10468] [21] python[0x53fc97]
+[or-condo-c89:10468] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [23] python[0x53eb01]
+[or-condo-c89:10468] [24] python[0x53fc97]
+[or-condo-c89:10468] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10468] [26] python[0x53f771]
+[or-condo-c89:10468] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10468] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10468] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10468] *** End of error message ***
+[or-condo-c89:10470] *** Process received signal ***
+[or-condo-c89:10470] Signal: Segmentation fault (11)
+[or-condo-c89:10470] Signal code: Address not mapped (1)
+[or-condo-c89:10470] Failing at address: 0x454dc80
+[or-condo-c89:10470] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10470] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10470] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10470] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10470] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10470] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10470] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10470] [ 7] python[0x586026]
+[or-condo-c89:10470] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10470] [ 9] python[0x53fb54]
+[or-condo-c89:10470] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10470] [11] python[0x53eb01]
+[or-condo-c89:10470] [12] python[0x53fc97]
+[or-condo-c89:10470] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10470] [14] python[0x53eb01]
+[or-condo-c89:10470] [15] python[0x53fc97]
+[or-condo-c89:10470] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10470] [17] python[0x53eb01]
+[or-condo-c89:10470] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10470] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10470] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10470] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10470] [22] python[0x4c727b]
+[or-condo-c89:10470] [23] python[0x4be9da]
+[or-condo-c89:10470] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10470] [25] python[0x53f8c5]
+[or-condo-c89:10470] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10470] [27] python[0x53eb01]
+[or-condo-c89:10470] [28] python[0x53fc97]
+[or-condo-c89:10470] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10470] *** End of error message ***
+/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/backend/semaphore_tracker.py:74: UserWarning: semaphore_tracker: process died unexpectedly, relaunching.  Some semaphores might leak.
+  warnings.warn('semaphore_tracker: process died unexpectedly, '
+[or-condo-c89:10472] *** Process received signal ***
+[or-condo-c89:10472] Signal: Segmentation fault (11)
+[or-condo-c89:10472] Signal code: Address not mapped (1)
+[or-condo-c89:10472] Failing at address: 0x454dc80
+[or-condo-c89:10472] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10472] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10472] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10472] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10472] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10472] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10472] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10472] [ 7] python[0x586026]
+[or-condo-c89:10472] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10472] [ 9] python[0x53fb54]
+[or-condo-c89:10472] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [11] python[0x53eb01]
+[or-condo-c89:10472] [12] python[0x53fc97]
+[or-condo-c89:10472] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [14] python[0x53eb01]
+[or-condo-c89:10472] [15] python[0x53fc97]
+[or-condo-c89:10472] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [17] python[0x53eb01]
+[or-condo-c89:10472] [18] python[0x53fc97]
+[or-condo-c89:10472] [19] [or-condo-c89:10474] *** Process received signal ***
+python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [20] [or-condo-c89:10474] Signal: Segmentation fault (11)
+[or-condo-c89:10474] Signal code: Address not mapped (1)
+[or-condo-c89:10474] Failing at address: 0x454dc80
+python[0x53eb01]
+[or-condo-c89:10472] [21] python[0x53fc97]
+[or-condo-c89:10472] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [23] python[0x53eb01]
+[or-condo-c89:10472] [24] python[0x53fc97]
+[or-condo-c89:10472] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10472] [26] python[0x53f771]
+[or-condo-c89:10472] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10472] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10472] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10472] *** End of error message ***
+[or-condo-c89:10474] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10474] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10474] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10474] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10474] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10474] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10474] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10474] [ 7] python[0x586026]
+[or-condo-c89:10474] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10474] [ 9] python[0x53fb54]
+[or-condo-c89:10474] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10474] [11] python[0x53eb01]
+[or-condo-c89:10474] [12] python[0x53fc97]
+[or-condo-c89:10474] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10474] [14] python[0x53eb01]
+[or-condo-c89:10474] [15] python[0x53fc97]
+[or-condo-c89:10474] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10474] [17] python[0x53eb01]
+[or-condo-c89:10474] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10474] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10474] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10474] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10474] [22] python[0x4c727b]
+[or-condo-c89:10474] [23] python[0x4be9da]
+[or-condo-c89:10474] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10474] [25] python[0x53f8c5]
+[or-condo-c89:10474] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10474] [27] python[0x53eb01]
+[or-condo-c89:10474] [28] python[0x53fc97]
+[or-condo-c89:10474] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10474] *** End of error message ***
+[or-condo-c89:10476] *** Process received signal ***
+[or-condo-c89:10476] Signal: Segmentation fault (11)
+[or-condo-c89:10476] Signal code: Address not mapped (1)
+[or-condo-c89:10476] Failing at address: 0x454dc80
+[or-condo-c89:10476] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10476] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10476] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10476] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10476] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10476] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10476] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10476] [ 7] python[0x586026]
+[or-condo-c89:10476] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10476] [ 9] python[0x53fb54]
+[or-condo-c89:10476] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10476] [11] python[0x53eb01]
+[or-condo-c89:10476] [12] python[0x53fc97]
+[or-condo-c89:10476] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10476] [14] python[0x53eb01]
+[or-condo-c89:10476] [15] python[0x53fc97]
+[or-condo-c89:10476] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10476] [17] python[0x53eb01]
+[or-condo-c89:10476] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10476] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10476] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10476] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10476] [22] python[0x4c727b]
+[or-condo-c89:10476] [23] python[0x4be9da]
+[or-condo-c89:10476] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10476] [25] python[0x53f8c5]
+[or-condo-c89:10476] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10476] [27] python[0x53eb01]
+[or-condo-c89:10476] [28] python[0x53fc97]
+[or-condo-c89:10476] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10476] *** End of error message ***
+[or-condo-c89:10478] *** Process received signal ***
+[or-condo-c89:10478] Signal: Segmentation fault (11)
+[or-condo-c89:10478] Signal code: Address not mapped (1)
+[or-condo-c89:10478] Failing at address: 0x454dc80
+[or-condo-c89:10478] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10478] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10478] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10478] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10478] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10478] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10478] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10478] [ 7] python[0x586026]
+[or-condo-c89:10478] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10478] [ 9] python[0x53fb54]
+[or-condo-c89:10478] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [11] python[0x53eb01]
+[or-condo-c89:10478] [12] python[0x53fc97]
+[or-condo-c89:10478] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [14] python[0x53eb01]
+[or-condo-c89:10478] [15] python[0x53fc97]
+[or-condo-c89:10478] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [17] python[0x53eb01]
+[or-condo-c89:10478] [18] python[0x53fc97]
+[or-condo-c89:10478] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [20] python[0x53eb01]
+[or-condo-c89:10478] [21] python[0x53fc97]
+[or-condo-c89:10478] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [23] python[0x53eb01]
+[or-condo-c89:10478] [24] python[0x53fc97]
+[or-condo-c89:10478] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10478] [26] python[0x53f771]
+[or-condo-c89:10478] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10478] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10478] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10478] *** End of error message ***
+[or-condo-c89:10480] *** Process received signal ***
+[or-condo-c89:10480] Signal: Segmentation fault (11)
+[or-condo-c89:10480] Signal code: Address not mapped (1)
+[or-condo-c89:10480] Failing at address: 0x454dc80
+[or-condo-c89:10480] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10480] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10480] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10480] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10480] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10480] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10480] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10480] [ 7] python[0x586026]
+[or-condo-c89:10480] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10480] [ 9] python[0x53fb54]
+[or-condo-c89:10480] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10480] [11] python[0x53eb01]
+[or-condo-c89:10480] [12] python[0x53fc97]
+[or-condo-c89:10480] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10480] [14] python[0x53eb01]
+[or-condo-c89:10480] [15] python[0x53fc97]
+[or-condo-c89:10480] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10480] [17] python[0x53eb01]
+[or-condo-c89:10480] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10480] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10480] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10480] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10480] [22] python[0x4c727b]
+[or-condo-c89:10480] [23] python[0x4be9da]
+[or-condo-c89:10480] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10480] [25] python[0x53f8c5]
+[or-condo-c89:10480] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10480] [27] python[0x53eb01]
+[or-condo-c89:10480] [28] python[0x53fc97]
+[or-condo-c89:10480] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10480] *** End of error message ***
+[or-condo-c89:10482] *** Process received signal ***
+[or-condo-c89:10482] Signal: Segmentation fault (11)
+[or-condo-c89:10482] Signal code: Address not mapped (1)
+[or-condo-c89:10482] Failing at address: 0x454dc80
+[or-condo-c89:10482] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10482] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10482] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10482] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10482] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10482] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10482] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10482] [ 7] python[0x586026]
+[or-condo-c89:10482] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10482] [ 9] python[0x53fb54]
+[or-condo-c89:10482] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [11] python[0x53eb01]
+[or-condo-c89:10482] [12] python[0x53fc97]
+[or-condo-c89:10482] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [14] python[0x53eb01]
+[or-condo-c89:10482] [15] python[0x53fc97]
+[or-condo-c89:10482] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [17] python[0x53eb01]
+[or-condo-c89:10482] [18] python[0x53fc97]
+[or-condo-c89:10482] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [20] python[0x53eb01]
+[or-condo-c89:10482] [21] python[0x53fc97]
+[or-condo-c89:10482] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [23] python[0x53eb01]
+[or-condo-c89:10482] [24] python[0x53fc97]
+[or-condo-c89:10482] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10482] [26] python[0x53f771]
+[or-condo-c89:10482] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10482] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10482] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10482] *** End of error message ***
+[or-condo-c89:10484] *** Process received signal ***
+[or-condo-c89:10484] Signal: Segmentation fault (11)
+[or-condo-c89:10484] Signal code: Address not mapped (1)
+[or-condo-c89:10484] Failing at address: 0x454dc80
+[or-condo-c89:10484] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10484] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10484] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10484] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10484] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10484] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10484] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10484] [ 7] python[0x586026]
+[or-condo-c89:10484] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10484] [ 9] python[0x53fb54]
+[or-condo-c89:10484] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10484] [11] python[0x53eb01]
+[or-condo-c89:10484] [12] python[0x53fc97]
+[or-condo-c89:10484] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10484] [14] python[0x53eb01]
+[or-condo-c89:10484] [15] python[0x53fc97]
+[or-condo-c89:10484] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10484] [17] python[0x53eb01]
+[or-condo-c89:10484] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10484] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10484] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10484] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10484] [22] python[0x4c727b]
+[or-condo-c89:10484] [23] python[0x4be9da]
+[or-condo-c89:10484] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10484] [25] python[0x53f8c5]
+[or-condo-c89:10484] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10484] [27] python[0x53eb01]
+[or-condo-c89:10484] [28] python[0x53fc97]
+[or-condo-c89:10484] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10484] *** End of error message ***
+[or-condo-c89:10486] *** Process received signal ***
+[or-condo-c89:10486] Signal: Segmentation fault (11)
+[or-condo-c89:10486] Signal code: Address not mapped (1)
+[or-condo-c89:10486] Failing at address: 0x454dc80
+[or-condo-c89:10486] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10486] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10486] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10486] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10486] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10486] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10486] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10486] [ 7] python[0x586026]
+[or-condo-c89:10486] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10486] [ 9] python[0x53fb54]
+[or-condo-c89:10486] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [11] python[0x53eb01]
+[or-condo-c89:10486] [12] python[0x53fc97]
+[or-condo-c89:10486] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [14] python[0x53eb01]
+[or-condo-c89:10486] [15] python[0x53fc97]
+[or-condo-c89:10486] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [17] python[0x53eb01]
+[or-condo-c89:10486] [18] python[0x53fc97]
+[or-condo-c89:10486] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [20] python[0x53eb01]
+[or-condo-c89:10486] [21] python[0x53fc97]
+[or-condo-c89:10486] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [23] python[0x53eb01]
+[or-condo-c89:10486] [24] python[0x53fc97]
+[or-condo-c89:10486] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10486] [26] python[0x53f771]
+[or-condo-c89:10486] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10486] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10486] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10486] *** End of error message ***
+[or-condo-c89:10488] *** Process received signal ***
+[or-condo-c89:10488] Signal: Segmentation fault (11)
+[or-condo-c89:10488] Signal code: Address not mapped (1)
+[or-condo-c89:10488] Failing at address: 0x454dc80
+[or-condo-c89:10488] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10488] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10488] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10488] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10488] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10488] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10488] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10488] [ 7] python[0x586026]
+[or-condo-c89:10488] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10488] [ 9] python[0x53fb54]
+[or-condo-c89:10488] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10488] [11] python[0x53eb01]
+[or-condo-c89:10488] [12] python[0x53fc97]
+[or-condo-c89:10488] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10488] [14] python[0x53eb01]
+[or-condo-c89:10488] [15] python[0x53fc97]
+[or-condo-c89:10488] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10488] [17] python[0x53eb01]
+[or-condo-c89:10488] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10488] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10488] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10488] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10488] [22] python[0x4c727b]
+[or-condo-c89:10488] [23] python[0x4be9da]
+[or-condo-c89:10488] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10488] [25] python[0x53f8c5]
+[or-condo-c89:10488] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10488] [27] python[0x53eb01]
+[or-condo-c89:10488] [28] python[0x53fc97]
+[or-condo-c89:10488] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10488] *** End of error message ***
+[or-condo-c89:10490] *** Process received signal ***
+[or-condo-c89:10490] Signal: Segmentation fault (11)
+[or-condo-c89:10490] Signal code: Address not mapped (1)
+[or-condo-c89:10490] Failing at address: 0x454dc80
+[or-condo-c89:10490] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10490] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10490] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10490] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10490] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10490] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10490] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10490] [ 7] python[0x586026]
+[or-condo-c89:10490] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10490] [ 9] python[0x53fb54]
+[or-condo-c89:10490] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [11] python[0x53eb01]
+[or-condo-c89:10490] [12] python[0x53fc97]
+[or-condo-c89:10490] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [14] python[0x53eb01]
+[or-condo-c89:10490] [15] python[0x53fc97]
+[or-condo-c89:10490] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [17] python[0x53eb01]
+[or-condo-c89:10490] [18] python[0x53fc97]
+[or-condo-c89:10490] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [20] python[0x53eb01]
+[or-condo-c89:10490] [21] python[0x53fc97]
+[or-condo-c89:10490] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [23] python[0x53eb01]
+[or-condo-c89:10490] [24] python[0x53fc97]
+[or-condo-c89:10490] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10490] [26] python[0x53f771]
+[or-condo-c89:10490] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10490] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10490] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10490] *** End of error message ***
+[or-condo-c89:10492] *** Process received signal ***
+[or-condo-c89:10492] Signal: Segmentation fault (11)
+[or-condo-c89:10492] Signal code: Address not mapped (1)
+[or-condo-c89:10492] Failing at address: 0x454dc80
+[or-condo-c89:10492] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10492] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10492] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10492] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10492] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10492] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10492] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10492] [ 7] python[0x586026]
+[or-condo-c89:10492] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10492] [ 9] python[0x53fb54]
+[or-condo-c89:10492] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10492] [11] python[0x53eb01]
+[or-condo-c89:10492] [12] python[0x53fc97]
+[or-condo-c89:10492] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10492] [14] python[0x53eb01]
+[or-condo-c89:10492] [15] python[0x53fc97]
+[or-condo-c89:10492] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10492] [17] python[0x53eb01]
+[or-condo-c89:10492] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10492] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10492] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10492] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10492] [22] python[0x4c727b]
+[or-condo-c89:10492] [23] python[0x4be9da]
+[or-condo-c89:10492] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10492] [25] python[0x53f8c5]
+[or-condo-c89:10492] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10492] [27] python[0x53eb01]
+[or-condo-c89:10492] [28] python[0x53fc97]
+[or-condo-c89:10492] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10492] *** End of error message ***
+[or-condo-c89:10494] *** Process received signal ***
+[or-condo-c89:10494] Signal: Segmentation fault (11)
+[or-condo-c89:10494] Signal code: Address not mapped (1)
+[or-condo-c89:10494] Failing at address: 0x454dc80
+[or-condo-c89:10494] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10494] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10494] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10494] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10494] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10494] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10494] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10494] [ 7] python[0x586026]
+[or-condo-c89:10494] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10494] [ 9] python[0x53fb54]
+[or-condo-c89:10494] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [11] python[0x53eb01]
+[or-condo-c89:10494] [12] python[0x53fc97]
+[or-condo-c89:10494] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [14] python[0x53eb01]
+[or-condo-c89:10494] [15] python[0x53fc97]
+[or-condo-c89:10494] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [17] python[0x53eb01]
+[or-condo-c89:10494] [18] python[0x53fc97]
+[or-condo-c89:10494] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [20] python[0x53eb01]
+[or-condo-c89:10494] [21] python[0x53fc97]
+[or-condo-c89:10494] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [23] python[0x53eb01]
+[or-condo-c89:10494] [24] python[0x53fc97]
+[or-condo-c89:10494] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10494] [26] python[0x53f771]
+[or-condo-c89:10494] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10494] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10494] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10494] *** End of error message ***
+[or-condo-c89:10496] *** Process received signal ***
+[or-condo-c89:10496] Signal: Segmentation fault (11)
+[or-condo-c89:10496] Signal code: Address not mapped (1)
+[or-condo-c89:10496] Failing at address: 0x454dc80
+[or-condo-c89:10496] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10496] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10496] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10496] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10496] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10496] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10496] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10496] [ 7] python[0x586026]
+[or-condo-c89:10496] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10496] [ 9] python[0x53fb54]
+[or-condo-c89:10496] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10496] [11] python[0x53eb01]
+[or-condo-c89:10496] [12] python[0x53fc97]
+[or-condo-c89:10496] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10496] [14] python[0x53eb01]
+[or-condo-c89:10496] [15] python[0x53fc97]
+[or-condo-c89:10496] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10496] [17] python[0x53eb01]
+[or-condo-c89:10496] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10496] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10496] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10496] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10496] [22] python[0x4c727b]
+[or-condo-c89:10496] [23] python[0x4be9da]
+[or-condo-c89:10496] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10496] [25] python[0x53f8c5]
+[or-condo-c89:10496] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10496] [27] python[0x53eb01]
+[or-condo-c89:10496] [28] python[0x53fc97]
+[or-condo-c89:10496] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10496] *** End of error message ***
+[or-condo-c89:10498] *** Process received signal ***
+[or-condo-c89:10498] Signal: Segmentation fault (11)
+[or-condo-c89:10498] Signal code: Address not mapped (1)
+[or-condo-c89:10498] Failing at address: 0x454dc80
+[or-condo-c89:10498] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10498] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10498] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10498] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10498] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10498] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10498] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10498] [ 7] python[0x586026]
+[or-condo-c89:10498] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10498] [ 9] python[0x53fb54]
+[or-condo-c89:10498] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [11] python[0x53eb01]
+[or-condo-c89:10498] [12] python[0x53fc97]
+[or-condo-c89:10498] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [14] python[0x53eb01]
+[or-condo-c89:10498] [15] python[0x53fc97]
+[or-condo-c89:10498] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [17] python[0x53eb01]
+[or-condo-c89:10498] [18] python[0x53fc97]
+[or-condo-c89:10498] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [20] python[0x53eb01]
+[or-condo-c89:10498] [21] python[0x53fc97]
+[or-condo-c89:10498] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [23] python[0x53eb01]
+[or-condo-c89:10498] [24] python[0x53fc97]
+[or-condo-c89:10498] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10498] [26] python[0x53f771]
+[or-condo-c89:10498] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10498] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10498] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10498] *** End of error message ***
+[or-condo-c89:10500] *** Process received signal ***
+[or-condo-c89:10500] Signal: Segmentation fault (11)
+[or-condo-c89:10500] Signal code: Address not mapped (1)
+[or-condo-c89:10500] Failing at address: 0x454dc80
+[or-condo-c89:10500] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10500] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10500] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10500] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10500] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10500] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10500] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10500] [ 7] python[0x586026]
+[or-condo-c89:10500] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10500] [ 9] python[0x53fb54]
+[or-condo-c89:10500] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10500] [11] python[0x53eb01]
+[or-condo-c89:10500] [12] python[0x53fc97]
+[or-condo-c89:10500] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10500] [14] python[0x53eb01]
+[or-condo-c89:10500] [15] python[0x53fc97]
+[or-condo-c89:10500] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10500] [17] python[0x53eb01]
+[or-condo-c89:10500] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10500] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10500] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10500] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10500] [22] python[0x4c727b]
+[or-condo-c89:10500] [23] python[0x4be9da]
+[or-condo-c89:10500] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10500] [25] python[0x53f8c5]
+[or-condo-c89:10500] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10500] [27] python[0x53eb01]
+[or-condo-c89:10500] [28] python[0x53fc97]
+[or-condo-c89:10500] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10500] *** End of error message ***
+[or-condo-c89:10502] *** Process received signal ***
+[or-condo-c89:10502] Signal: Segmentation fault (11)
+[or-condo-c89:10502] Signal code: Address not mapped (1)
+[or-condo-c89:10502] Failing at address: 0x454dc80
+[or-condo-c89:10502] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10502] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10502] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10502] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10502] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10502] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10502] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10502] [ 7] python[0x586026]
+[or-condo-c89:10502] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10502] [ 9] python[0x53fb54]
+[or-condo-c89:10502] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [11] python[0x53eb01]
+[or-condo-c89:10502] [12] python[0x53fc97]
+[or-condo-c89:10502] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [14] python[0x53eb01]
+[or-condo-c89:10502] [15] python[0x53fc97]
+[or-condo-c89:10502] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [17] python[0x53eb01]
+[or-condo-c89:10502] [18] python[0x53fc97]
+[or-condo-c89:10502] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [20] python[0x53eb01]
+[or-condo-c89:10502] [21] python[0x53fc97]
+[or-condo-c89:10502] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [23] python[0x53eb01]
+[or-condo-c89:10502] [24] python[0x53fc97]
+[or-condo-c89:10502] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10502] [26] python[0x53f771]
+[or-condo-c89:10502] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10502] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10502] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10502] *** End of error message ***
+[or-condo-c89:10504] *** Process received signal ***
+[or-condo-c89:10504] Signal: Segmentation fault (11)
+[or-condo-c89:10504] Signal code: Address not mapped (1)
+[or-condo-c89:10504] Failing at address: 0x454dc80
+[or-condo-c89:10504] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10504] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10504] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10504] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10504] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10504] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10504] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10504] [ 7] python[0x586026]
+[or-condo-c89:10504] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10504] [ 9] python[0x53fb54]
+[or-condo-c89:10504] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10504] [11] python[0x53eb01]
+[or-condo-c89:10504] [12] python[0x53fc97]
+[or-condo-c89:10504] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10504] [14] python[0x53eb01]
+[or-condo-c89:10504] [15] python[0x53fc97]
+[or-condo-c89:10504] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10504] [17] python[0x53eb01]
+[or-condo-c89:10504] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10504] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10504] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10504] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10504] [22] python[0x4c727b]
+[or-condo-c89:10504] [23] python[0x4be9da]
+[or-condo-c89:10504] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10504] [25] python[0x53f8c5]
+[or-condo-c89:10504] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10504] [27] python[0x53eb01]
+[or-condo-c89:10504] [28] python[0x53fc97]
+[or-condo-c89:10504] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10504] *** End of error message ***
+[or-condo-c89:10506] *** Process received signal ***
+[or-condo-c89:10506] Signal: Segmentation fault (11)
+[or-condo-c89:10506] Signal code: Address not mapped (1)
+[or-condo-c89:10506] Failing at address: 0x454dc80
+[or-condo-c89:10506] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10506] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10506] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10506] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10506] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10506] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10506] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10506] [ 7] python[0x586026]
+[or-condo-c89:10506] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10506] [ 9] python[0x53fb54]
+[or-condo-c89:10506] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [11] python[0x53eb01]
+[or-condo-c89:10506] [12] python[0x53fc97]
+[or-condo-c89:10506] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [14] python[0x53eb01]
+[or-condo-c89:10506] [15] python[0x53fc97]
+[or-condo-c89:10506] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [17] python[0x53eb01]
+[or-condo-c89:10506] [18] python[0x53fc97]
+[or-condo-c89:10506] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [20] python[0x53eb01]
+[or-condo-c89:10506] [21] python[0x53fc97]
+[or-condo-c89:10506] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [23] python[0x53eb01]
+[or-condo-c89:10506] [24] python[0x53fc97]
+[or-condo-c89:10506] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10506] [26] python[0x53f771]
+[or-condo-c89:10506] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10506] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10506] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10506] *** End of error message ***
+[or-condo-c89:10508] *** Process received signal ***
+[or-condo-c89:10508] Signal: Segmentation fault (11)
+[or-condo-c89:10508] Signal code: Address not mapped (1)
+[or-condo-c89:10508] Failing at address: 0x454dc80
+[or-condo-c89:10508] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10508] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10508] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10508] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10508] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10508] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10508] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10508] [ 7] python[0x586026]
+[or-condo-c89:10508] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10508] [ 9] python[0x53fb54]
+[or-condo-c89:10508] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10508] [11] python[0x53eb01]
+[or-condo-c89:10508] [12] python[0x53fc97]
+[or-condo-c89:10508] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10508] [14] python[0x53eb01]
+[or-condo-c89:10508] [15] python[0x53fc97]
+[or-condo-c89:10508] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10508] [17] python[0x53eb01]
+[or-condo-c89:10508] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10508] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10508] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10508] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10508] [22] python[0x4c727b]
+[or-condo-c89:10508] [23] python[0x4be9da]
+[or-condo-c89:10508] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10508] [25] python[0x53f8c5]
+[or-condo-c89:10508] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10508] [27] python[0x53eb01]
+[or-condo-c89:10508] [28] python[0x53fc97]
+[or-condo-c89:10508] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10508] *** End of error message ***
+[or-condo-c89:10510] *** Process received signal ***
+[or-condo-c89:10510] Signal: Segmentation fault (11)
+[or-condo-c89:10510] Signal code: Address not mapped (1)
+[or-condo-c89:10510] Failing at address: 0x454dc80
+[or-condo-c89:10510] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10510] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10510] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10510] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10510] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10510] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10510] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10510] [ 7] python[0x586026]
+[or-condo-c89:10510] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10510] [ 9] python[0x53fb54]
+[or-condo-c89:10510] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [11] python[0x53eb01]
+[or-condo-c89:10510] [12] python[0x53fc97]
+[or-condo-c89:10510] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [14] python[0x53eb01]
+[or-condo-c89:10510] [15] python[0x53fc97]
+[or-condo-c89:10510] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [17] python[0x53eb01]
+[or-condo-c89:10510] [18] python[0x53fc97]
+[or-condo-c89:10510] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [20] python[0x53eb01]
+[or-condo-c89:10510] [21] python[0x53fc97]
+[or-condo-c89:10510] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [23] python[0x53eb01]
+[or-condo-c89:10510] [24] python[0x53fc97]
+[or-condo-c89:10510] [25] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10510] [26] python[0x53f771]
+[or-condo-c89:10510] [27] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10510] [28] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10510] [29] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10510] *** End of error message ***
+[or-condo-c89:10512] *** Process received signal ***
+[or-condo-c89:10512] Signal: Segmentation fault (11)
+[or-condo-c89:10512] Signal code: Address not mapped (1)
+[or-condo-c89:10512] Failing at address: 0x454dc80
+[or-condo-c89:10512] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10512] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10512] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10512] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10512] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10512] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10512] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10512] [ 7] python[0x586026]
+[or-condo-c89:10512] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10512] [ 9] python[0x53fb54]
+[or-condo-c89:10512] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10512] [11] python[0x53eb01]
+[or-condo-c89:10512] [12] python[0x53fc97]
+[or-condo-c89:10512] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10512] [14] python[0x53eb01]
+[or-condo-c89:10512] [15] python[0x53fc97]
+[or-condo-c89:10512] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10512] [17] python[0x53eb01]
+[or-condo-c89:10512] [18] python(_PyFunction_FastCallDict+0x236)[0x548a26]
+[or-condo-c89:10512] [19] python(_PyObject_FastCallDict+0x1ef)[0x4513ef]
+[or-condo-c89:10512] [20] python(_PyObject_Call_Prepend+0xcb)[0x4514eb]
+[or-condo-c89:10512] [21] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10512] [22] python[0x4c727b]
+[or-condo-c89:10512] [23] python[0x4be9da]
+[or-condo-c89:10512] [24] python(_PyObject_FastCallDict+0xa2)[0x4512a2]
+[or-condo-c89:10512] [25] python[0x53f8c5]
+[or-condo-c89:10512] [26] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10512] [27] python[0x53eb01]
+[or-condo-c89:10512] [28] python[0x53fc97]
+[or-condo-c89:10512] [29] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10512] *** End of error message ***
+exception calling callback for <Future at 0x2ad057603b00 state=finished raised TerminatedWorkerError>
+Traceback (most recent call last):
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/_base.py", line 625, in _invoke_callbacks
+    callback(self)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 309, in __call__
+    self.parallel.dispatch_next()
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 731, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 759, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 716, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/_parallel_backends.py", line 510, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/reusable_executor.py", line 151, in submit
+    fn, *args, **kwargs)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/process_executor.py", line 1022, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker. The exit codes of the workers are {SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11)}
+[or-condo-c89:10516] *** Process received signal ***
+[or-condo-c89:10516] Signal: Segmentation fault (11)
+[or-condo-c89:10516] Signal code: Address not mapped (1)
+[or-condo-c89:10516] Failing at address: 0x454dc80
+[or-condo-c89:10516] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10516] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10516] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10516] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10516] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10516] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10516] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10516] [ 7] python[0x586026]
+[or-condo-c89:10516] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10516] [ 9] python[0x53fb54]
+[or-condo-c89:10516] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10516] [11] python[0x53eb01]
+[or-condo-c89:10516] [12] python[0x53fc97]
+[or-condo-c89:10516] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10516] [14] python[0x53eb01]
+[or-condo-c89:10516] [15] python[0x53fc97]
+[or-condo-c89:10516] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10516] [17] python[0x53eb01]
+[or-condo-c89:10516] [18] python[0x53fc97]
+[or-condo-c89:10516] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10516] [20] python[0x53eb01]
+[or-condo-c89:10516] [21] python[0x53fc97]
+[or-condo-c89:10516] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10516] [23] python[0x53f771]
+[or-condo-c89:10516] [24] python(PyEval_EvalCodeEx+0x6d)[0x54066d]
+[or-condo-c89:10516] [25] python[0x481227]
+[or-condo-c89:10516] [26] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10516] [27] python(_PyEval_EvalFrameDefault+0x4262)[0x544da2]
+[or-condo-c89:10516] [28] python[0x53f771]
+[or-condo-c89:10516] [29] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10516] *** End of error message ***
+[or-condo-c89:10518] *** Process received signal ***
+[or-condo-c89:10518] Signal: Segmentation fault (11)
+[or-condo-c89:10518] Signal code: Address not mapped (1)
+[or-condo-c89:10518] Failing at address: 0x454dc80
+Traceback (most recent call last):
+  File "bay_inf_script_500subset.py", line 63, in <module>
+    h5_bayes_group = abi_subset.compute()
+  File "/home/29t/.local/lib/python3.6/site-packages/pyUSID/processing/process.py", line 657, in compute
+    self._unit_computation(*args, **kwargs)
+  File "/lustre/or-hydra/cades-birthright/29t/pycroscopy/pycroscopy/analysis/bayesian_inference/parallelTiming/bayesian_inference.py", line 293, in _unit_computation
+    shifted_i_meas = parallel_compute(self.data[:, ::self.parse_mod], get_shifted_response, cores=self._cores, func_args=[self.shift_index])
+  File "/home/29t/.local/lib/python3.6/site-packages/pyUSID/processing/comp_utils.py", line 155, in parallel_compute
+    results = joblib.Parallel(n_jobs=cores)(values)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 934, in __call__
+    self.retrieve()
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 833, in retrieve
+    self._output.extend(job.get(timeout=self.timeout))
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/_parallel_backends.py", line 521, in wrap_future_result
+    return future.result(timeout=timeout)
+  File "/software/dev_tools/swtree/cs400_centos7.2_pe2016-08/python/3.6.3/centos7.2_gnu5.3.0/lib/python3.6/concurrent/futures/_base.py", line 432, in result
+    return self.__get_result()
+  File "/software/dev_tools/swtree/cs400_centos7.2_pe2016-08/python/3.6.3/centos7.2_gnu5.3.0/lib/python3.6/concurrent/futures/_base.py", line 384, in __get_result
+    raise self._exception
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/_base.py", line 625, in _invoke_callbacks
+    callback(self)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 309, in __call__
+    self.parallel.dispatch_next()
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 731, in dispatch_next
+    if not self.dispatch_one_batch(self._original_iterator):
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 759, in dispatch_one_batch
+    self._dispatch(tasks)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/parallel.py", line 716, in _dispatch
+    job = self._backend.apply_async(batch, callback=cb)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/_parallel_backends.py", line 510, in apply_async
+    future = self._workers.submit(SafeFunction(func))
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/reusable_executor.py", line 151, in submit
+    fn, *args, **kwargs)
+  File "/home/29t/.local/lib/python3.6/site-packages/joblib/externals/loky/process_executor.py", line 1022, in submit
+    raise self._flags.broken
+joblib.externals.loky.process_executor.TerminatedWorkerError: A worker process managed by the executor was unexpectedly terminated. This could be caused by a segmentation fault while calling the function or by an excessive memory usage causing the Operating System to kill the worker. The exit codes of the workers are {SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11), SIGSEGV(-11)}
+[or-condo-c89:10518] [ 0] /lib64/libpthread.so.0(+0xf6d0)[0x2acfd96406d0]
+[or-condo-c89:10518] [ 1] /lib64/ld-linux-x86-64.so.2(+0x98a0)[0x2acfd94168a0]
+[or-condo-c89:10518] [ 2] /lib64/ld-linux-x86-64.so.2(+0xa20f)[0x2acfd941720f]
+[or-condo-c89:10518] [ 3] /lib64/ld-linux-x86-64.so.2(+0xef1e)[0x2acfd941bf1e]
+[or-condo-c89:10518] [ 4] /lib64/ld-linux-x86-64.so.2(+0x16b2a)[0x2acfd9423b2a]
+[or-condo-c89:10518] [ 5] python(_PyGILState_Reinit+0x3d)[0x424a4d]
+[or-condo-c89:10518] [ 6] python(PyOS_AfterFork+0x18)[0x43e778]
+[or-condo-c89:10518] [ 7] python[0x586026]
+[or-condo-c89:10518] [ 8] python(_PyCFunction_FastCallKeywords+0x139)[0x4a92a9]
+[or-condo-c89:10518] [ 9] python[0x53fb54]
+[or-condo-c89:10518] [10] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10518] [11] python[0x53eb01]
+[or-condo-c89:10518] [12] python[0x53fc97]
+[or-condo-c89:10518] [13] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10518] [14] python[0x53eb01]
+[or-condo-c89:10518] [15] python[0x53fc97]
+[or-condo-c89:10518] [16] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10518] [17] python[0x53eb01]
+[or-condo-c89:10518] [18] python[0x53fc97]
+[or-condo-c89:10518] [19] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10518] [20] python[0x53eb01]
+[or-condo-c89:10518] [21] python[0x53fc97]
+[or-condo-c89:10518] [22] python(_PyEval_EvalFrameDefault+0x3e6c)[0x5449ac]
+[or-condo-c89:10518] [23] python[0x53f771]
+[or-condo-c89:10518] [24] python(PyEval_EvalCodeEx+0x6d)[0x54066d]
+[or-condo-c89:10518] [25] python[0x481227]
+[or-condo-c89:10518] [26] python(PyObject_Call+0x60)[0x4510c0]
+[or-condo-c89:10518] [27] python(_PyEval_EvalFrameDefault+0x4262)[0x544da2]
+[or-condo-c89:10518] [28] python[0x53f771]
+[or-condo-c89:10518] [29] python(_PyFunction_FastCallDict+0x156)[0x548946]
+[or-condo-c89:10518] *** End of error message ***

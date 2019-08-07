@@ -285,7 +285,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
     nacc = 0
     #P = np.zeros((M+2, Ns))
     # Only store a million samples to save space
-    num_samples = min(Ns, int(1e6))
+    num_samples = min(Ns, int(1e4))
     P = np.zeros((M+2, num_samples))
 
     # Define prior

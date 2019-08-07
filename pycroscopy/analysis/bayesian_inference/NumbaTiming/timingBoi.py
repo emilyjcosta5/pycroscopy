@@ -27,7 +27,7 @@ from bayesian_inference import AdaptiveBayesianInference
 
 # Make a copy of the dataset so multiple processes can access it at the same time.
 h5_og_path = r"/home/29t/pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
-h5_path = r"/lustre/or-hydra/cades-birthright/29t/dataBoi{}.h5".format(time.time())
+h5_path = r"/lustre/or-hydra/cades-birthright/29t/NumbaDataBoi{}.h5".format(time.time())
 copyfile(h5_og_path, h5_path)
 
 M = 125

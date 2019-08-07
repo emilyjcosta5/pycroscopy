@@ -1,8 +1,26 @@
+import os
+import subprocess
+import sys
+import io
 import h5py
 #from mpi4py import MPI
-from bayesian_inference import AdaptiveBayesianInference
 import time
 import random
+from shutil import copyfile
+
+# Helper for importing packages
+def install(package):
+    subprocess.call([sys.executable, "-m", "pip", "install", "--user", package])
+
+try:
+    import pyUSID as usid
+except ImportError:
+    print("pyUSID not found. Will install with pip.")
+    import pip
+    install("pyUSID")
+    import pyUSID as usid
+
+from bayesian_inference import AdaptiveBayesianInference
 
 # Make a copy of the dataset so multiple processes can access it at the same time
 h5_og_path = r"/home/29t/pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
@@ -31,8 +49,10 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     randNum2 = random.randrange(266)
     myDict['X'] = [randNum1, randNum2]
 
+    print("Running compute on rows {} and {}".format(randNum1, randNum2))
+
     # Creates object from original data
-    #abi = AdaptiveBayesianInference(h5_resh)
+    abi = AdaptiveBayesianInference(h5_resh)
 
     #slice data
     subset = abi.h5_main.slice_to_dataset(slice_dict=myDict)
