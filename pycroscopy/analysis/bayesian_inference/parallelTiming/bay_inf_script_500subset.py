@@ -27,6 +27,8 @@ h5_og_path = r"/home/29t/pzt_nanocap_6_split_bayesian_compensation_R_correction 
 h5_path = r"/lustre/or-hydra/cades-birthright/29t/computeDataBoi{}.h5".format(time.time())
 copyfile(h5_og_path, h5_path)
 
+#h5_path = r"C:/Users/Administrator/Dropbox/GIv Bayesian June 2019/pzt_nanocap_6_split_bayesian_compensation_R_correction (Alvin Tan's conflicted copy 2019-06-25).h5"
+
 M = 100
 Ns = int(7e7)
 
@@ -60,6 +62,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     abi_subset = AdaptiveBayesianInference(subset, f=f, V0=V0, Ns=Ns, M=M)
     #compute
     startTime = time.time()
+    #h5_bayes_group = abi_subset.test()
     h5_bayes_group = abi_subset.compute()
     totalTime = time.time() - startTime
 
