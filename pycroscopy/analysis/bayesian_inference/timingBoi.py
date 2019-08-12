@@ -28,8 +28,8 @@ h5_path = r"/home/cades/pzt_nanocap_6_split_bayesian_compensation_R_correction (
 
 timingNames = ["parameterTiming", "../NumbaTiming", "../unoptimizedTiming"]
 timingM = [100, 125, 125]
-#timingNs = [int(7e7), int(5e8), int(5e8)]
-timingNs = [int(7e3), int(5e4), int(5e4)]
+timingNs = [int(7e7), int(5e8), int(5e8)]
+#timingNs = [int(7e3), int(5e4), int(5e4)]
 
 with h5py.File(h5_path, mode='r+') as h5_f:
 
