@@ -404,7 +404,7 @@ def _run_bayesian_inference(V, i_meas, M, dx, x, f, V0, Ns, dvdt, verbose=False)
                     print("Initial Cholesky failed 15 times in a row. This should not happen. Stopping inference and returning all zeros.")
                     return np.zeros(x.shape), np.zeros(x.shape), 0, np.zeros(i_meas.shape), np.zeros(i_meas.shape)
 
-            if verbose and ((i+1)%1e5 == 0):
+            if True:#verbose and ((i+1)%1e5 == 0):
                 print("i = {}".format(i+1))
 
         i += 1

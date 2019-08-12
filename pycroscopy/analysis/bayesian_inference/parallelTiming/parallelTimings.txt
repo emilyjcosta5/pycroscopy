@@ -2,3 +2,7 @@ Processing time in seconds for processing with Numpy
 of 10 instances of 512 randomly selected pixels in
 parallel (Ns = 7e7, M = 100)
 
+11.408385515213013
+11.235509634017944
+6.427485704421997
+6.61842942237854

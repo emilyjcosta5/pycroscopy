@@ -68,7 +68,7 @@ with h5py.File(h5_path, mode='r+') as h5_f:
     totalTime = time.time() - startTime
 
     #copy result group to new h5 file
-    with h5py.File('bayesian_results.h5', 'a') as f:
+    with h5py.File('bayesian_results{}.h5'.format(time.time()), 'a') as f:
         f.create_group("results0")
         h5_f.copy(h5_bayes_group, f, name="h5_bayes_group")
 
