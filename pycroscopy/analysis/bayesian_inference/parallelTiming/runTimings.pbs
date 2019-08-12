@@ -15,7 +15,7 @@ module list
 cd $PBS_O_WORKDIR
 pwd
 
-python bay_inf_script_500subset.py
-
+#python bay_inf_script_500subset.py
+python bay_inf_script.py
 
 
