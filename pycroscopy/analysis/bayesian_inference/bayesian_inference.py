@@ -137,9 +137,12 @@ class AdaptiveBayesianInference(Process):
 		# Return from test function you built seperately (see gmode_utils.test_filter for example)
 		return pix_ind, process_pixel(full_i_meas, self.full_V, self.split_index, self.M, self.dx, self.x, self.shift_index, self.f, self.V0, self.Ns, self.dvdt, pix_ind=pix_ind, graph=True, verbose=True)
 
-	def plotPixel(self, pix_ind=None):
+	def plotPixel(self, pix_ind=None, h5_results_grp=None):
 		if pix_ind is None:
 			return None
+
+		if h5_results_grp is not None:
+			self.h5_results_grp = h5_results_grp
 
 		# Need x, R, R_sig, V, i_meas, i_recon, i_corrected to graph against .h5_spec_vals[()]
 		x = usid.USIDataset(self.h5_results_grp["Resistance"]).h5_spec_vals[()][0]
