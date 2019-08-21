@@ -1,0 +1,4 @@
+Processing time in seconds for processing with Numpy
+of 200 randomly selected pixels in parallel (Ns = 1e8, M = 100)
+on 4 nodes with 32 processors each
+
